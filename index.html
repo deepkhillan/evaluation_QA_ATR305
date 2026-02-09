@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic API Testing Tool</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --pass: #3fb950;
+      --fail: #f85149;
+      --warning: #d29922;
+      --radius: 8px;
+      --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .input-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .input-group input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .input-group input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+    }
+
+    .input-row-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      width: 100%;
+    }
+
+    .file-upload-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .file-upload-wrap input[type="file"] {
+      position: absolute;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .file-upload-wrap .btn-upload {
+      padding: 0.75rem 1.25rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .file-upload-wrap .btn-upload:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .file-name {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.05s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #79b8ff;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--border);
+      color: var(--text);
+      margin-left: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      background: #3d4d66;
+    }
+
+    .loader {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .loader.visible {
+      display: flex;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .results-section {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .results-section.visible {
+      display: block;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .summary-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .summary-card.total .value { color: var(--accent); }
+    .summary-card.passed .value { color: var(--pass); }
+    .summary-card.failed .value { color: var(--fail); }
+    .summary-card.duration .value { font-size: 1.25rem; }
+
+    .summary-card .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .download-buttons {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .api-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .api-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .api-card.pass {
+      border-left: 4px solid var(--pass);
+    }
+
+    .api-card.fail {
+      border-left: 4px solid var(--fail);
+    }
+
+    .api-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .api-card-header:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .api-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .api-method {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .api-method.GET { background: rgba(63, 185, 80, 0.2); color: var(--pass); }
+    .api-method.POST { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
+    .api-method.PUT { background: rgba(210, 153, 34, 0.2); color: var(--warning); }
+    .api-method.DELETE { background: rgba(248, 81, 73, 0.2); color: var(--fail); }
+
+    .api-result-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+    }
+
+    .api-result-badge.pass {
+      background: rgba(63, 185, 80, 0.2);
+      color: var(--pass);
+    }
+
+    .api-result-badge.fail {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--fail);
+    }
+
+    .api-card-body {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .api-card.expanded .api-card-body {
+      display: block;
+    }
+
+    .api-details {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .api-detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .api-detail-row .key {
+      color: var(--text-muted);
+      min-width: 120px;
+    }
+
+    .api-detail-row .value {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      word-break: break-all;
+    }
+
+    .api-detail-row .value.fail-reason {
+      color: var(--fail);
+    }
+
+    .status-code-block {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .status-code-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .status-code-item .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status-code-item .code {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .status-code-item .code.expected {
+      background: rgba(63, 185, 80, 0.2);
+      color: var(--pass);
+    }
+
+    .status-code-item .code.actual {
+      background: rgba(88, 166, 255, 0.2);
+      color: var(--accent);
+    }
+
+    .status-code-item .code.actual.mismatch {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--fail);
+    }
+
+    .status-mismatch-hint {
+      font-size: 0.8rem;
+      color: var(--fail);
+      font-weight: 500;
+    }
+
+    .response-summary-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 0.9rem;
+    }
+
+    .response-summary-box.is-error {
+      border-color: rgba(248, 81, 73, 0.5);
+      background: rgba(248, 81, 73, 0.08);
+    }
+
+    .response-summary-box .summary-title {
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .response-summary-box .summary-message {
+      color: var(--text);
+      margin-bottom: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .response-summary-box .summary-message.highlight {
+      color: var(--fail);
+      font-weight: 500;
+    }
+
+    .response-summary-box .summary-meta {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .response-body-toggle {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .response-body-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .response-body-content {
+      display: none;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .response-body-content.visible {
+      display: block;
+    }
+
+    .error-message {
+      background: rgba(248, 81, 73, 0.15);
+      border: 1px solid var(--fail);
+      color: var(--fail);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+
+    .edit-rerun-wrap {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .edit-rerun-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+
+    .edit-rerun-btn:hover {
+      background: rgba(88, 166, 255, 0.15);
+    }
+
+    .edit-rerun-panel {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .edit-rerun-panel.visible {
+      display: block;
+    }
+
+    .edit-rerun-panel .panel-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .edit-rerun-row {
+      margin-bottom: 0.75rem;
+    }
+
+    .edit-rerun-row label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .edit-rerun-panel input[type="text"],
+    .edit-rerun-panel textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .edit-rerun-panel textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .edit-rerun-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-tabs .btn-filter {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .filter-tabs .btn-filter:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .filter-tabs .btn-filter.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Dynamic API Testing Tool</h1>
+      <p class="subtitle">Enter a JSON file URL or upload a JSON file containing your API definitions</p>
+    </header>
+
+    <div class="input-section">
+      <div class="input-row-label">JSON URL</div>
+      <div class="input-group">
+        <input
+          type="url"
+          id="jsonUrl"
+          placeholder="https://example.com/apis.json"
+          autocomplete="off"
+        />
+        <button type="button" id="submitBtn" class="btn btn-primary">Run API Tests</button>
+      </div>
+      <div class="input-row-label" style="margin-top: 1rem;">Or upload a file</div>
+      <div class="file-upload-wrap">
+        <input type="file" id="jsonFile" accept=".json,application/json" />
+        <label for="jsonFile" class="btn-upload">Choose JSON file</label>
+        <span class="file-name" id="fileName" aria-live="polite">No file chosen</span>
+      </div>
+      <div class="input-row-label" style="margin-top: 1rem;">Base URL (optional, for OpenAPI or relative endpoints)</div>
+      <div class="input-group">
+        <input
+          type="text"
+          id="baseUrl"
+          placeholder="e.g. https://api.example.com"
+          autocomplete="off"
+        />
+      </div>
+      <div class="input-row-label" style="margin-top: 0.75rem;">Base path (optional, e.g. /api/v2)</div>
+      <div class="input-group">
+        <input
+          type="text"
+          id="basePath"
+          placeholder="e.g. /api/users/v2"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <div id="errorMessage" class="error-message" role="alert"></div>
+    <div id="loader" class="loader" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <span>Running API tests...</span>
+    </div>
+
+    <section id="resultsSection" class="results-section" aria-live="polite">
+      <div class="summary" id="summary"></div>
+      <div class="download-buttons">
+        <button type="button" id="downloadJson" class="btn btn-secondary">Download Report (JSON)</button>
+        <button type="button" id="downloadHtml" class="btn btn-secondary">Download Report (HTML)</button>
+      </div>
+      <div class="filter-tabs" id="filterTabs" style="display: none;">
+        <button type="button" class="btn-filter active" data-filter="all">All</button>
+        <button type="button" class="btn-filter" data-filter="failed">Failed only</button>
+      </div>
+      <div class="api-list" id="apiList"></div>
+    </section>
+  </div>
+
+  <script>
+    /**
+     * Dynamic API Testing Tool
+     * Fetches a JSON config from URL, runs each API, validates response and status, and reports results.
+     */
+
+    // --- DOM elements ---
+    const jsonUrlInput = document.getElementById('jsonUrl');
+    const jsonFileInput = document.getElementById('jsonFile');
+    const fileNameEl = document.getElementById('fileName');
+    const baseUrlInput = document.getElementById('baseUrl');
+    const basePathInput = document.getElementById('basePath');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const loader = document.getElementById('loader');
+    const resultsSection = document.getElementById('resultsSection');
+    const summaryEl = document.getElementById('summary');
+    const apiListEl = document.getElementById('apiList');
+    const downloadJsonBtn = document.getElementById('downloadJson');
+    const downloadHtmlBtn = document.getElementById('downloadHtml');
+
+    /** Last run result for JSON export (full details including response body). */
+    let lastRunData = null;
+
+    /**
+     * Hides the error banner and clears its text.
+     */
+    function hideError() {
+      errorMessage.classList.remove('visible');
+      errorMessage.textContent = '';
+    }
+
+    /**
+     * Shows an error message in the UI.
+     * @param {string} msg - Error message to display.
+     */
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorMessage.classList.add('visible');
+    }
+
+    /**
+     * Validates that expected response keys exist in the response body.
+     * @param {object} body - Parsed response body (object).
+     * @param {string[]} expectedKeys - Array of key paths, e.g. ['data', 'user.id'].
+     * @returns {{ valid: boolean, missing: string[] }}
+     */
+    function validateResponseKeys(body, expectedKeys) {
+      if (!expectedKeys || expectedKeys.length === 0) {
+        return { valid: true, missing: [] };
+      }
+      const missing = [];
+      for (const keyPath of expectedKeys) {
+        const parts = keyPath.split('.');
+        let current = body;
+        for (const part of parts) {
+          if (current == null || typeof current !== 'object' || !(part in current)) {
+            missing.push(keyPath);
+            break;
+          }
+          current = current[part];
+        }
+      }
+      return {
+        valid: missing.length === 0,
+        missing
+      };
+    }
+
+    /**
+     * Executes a single API request and returns result object.
+     * @param {object} apiDef - API definition from JSON.
+     * @returns {Promise<object>} Result with status, duration, body, pass, reason, etc.
+     */
+    async function executeApi(apiDef) {
+      const start = performance.now();
+      const result = {
+        name: apiDef.name || 'Unnamed API',
+        method: (apiDef.method || 'GET').toUpperCase(),
+        url: apiDef.endpoint || apiDef.url,
+        expectedStatus: apiDef.expectedStatusCode,
+        requestHeaders: apiDef.headers || {},
+        requestBody: apiDef.body ?? apiDef.requestBody,
+        actualStatus: null,
+        responseTimeMs: null,
+        responseBody: null,
+        responseBodyText: null,
+        pass: false,
+        reason: null
+      };
+
+      const methodsWithBody = ['POST', 'PUT', 'PATCH'];
+      const hasBody = methodsWithBody.includes(result.method) && result.requestBody != null;
+
+      const fetchOptions = {
+        method: result.method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...result.requestHeaders
+        }
+      };
+
+      if (hasBody) {
+        fetchOptions.body = typeof result.requestBody === 'string'
+          ? result.requestBody
+          : JSON.stringify(result.requestBody);
+      }
+
+      try {
+        const response = await fetch(result.url, fetchOptions);
+        result.responseTimeMs = Math.round(performance.now() - start);
+        result.actualStatus = response.status;
+        result.responseBodyText = await response.text();
+
+        try {
+          result.responseBody = JSON.parse(result.responseBodyText);
+        } catch {
+          result.responseBody = result.responseBodyText;
+        }
+
+        // Status code validation
+        const expectedStatus = result.expectedStatus;
+        const statusOk = expectedStatus != null
+          ? response.status === expectedStatus
+          : response.ok;
+
+        if (!statusOk) {
+          result.pass = false;
+          result.reason = expectedStatus != null
+            ? `Expected status ${expectedStatus}, got ${response.status}`
+            : `Request failed with status ${response.status}`;
+          return result;
+        }
+
+        // Optional: validate expected response keys (only for JSON object body)
+        const expectedKeys = apiDef.expectedResponseKeys || apiDef.expectedKeys;
+        if (expectedKeys && Array.isArray(expectedKeys) && typeof result.responseBody === 'object') {
+          const keyValidation = validateResponseKeys(result.responseBody, expectedKeys);
+          if (!keyValidation.valid) {
+            result.pass = false;
+            result.reason = `Missing response keys: ${keyValidation.missing.join(', ')}`;
+            return result;
+          }
+        }
+
+        result.pass = true;
+        result.reason = null;
+        return result;
+      } catch (err) {
+        result.responseTimeMs = Math.round(performance.now() - start);
+        result.pass = false;
+        result.reason = err.message || 'Network or request error';
+        return result;
+      }
+    }
+
+    /**
+     * Returns true if an object looks like an API definition (has method or endpoint/url).
+     */
+    function looksLikeApiDef(obj) {
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+      const hasMethod = typeof obj.method === 'string';
+      const hasEndpoint = typeof (obj.endpoint || obj.url) === 'string';
+      if (hasMethod || hasEndpoint) return true;
+      const req = obj.request;
+      if (req && typeof req === 'object' && (req.method || req.url || (req.url && req.url.raw))) return true;
+      if (typeof (obj.httpMethod || obj.requestMethod) === 'string') return true;
+      return false;
+    }
+
+    /**
+     * Extracts a best-effort value for a Swagger/OpenAPI parameter.
+     * Uses: default -> x-example -> example. If required and missing, falls back to 1/"1".
+     */
+    function getParamValue(p) {
+      if (!p || typeof p !== 'object') return undefined;
+      let value =
+        p.default !== undefined
+          ? p.default
+          : (p['x-example'] !== undefined ? p['x-example'] : (p.example !== undefined ? p.example : undefined));
+
+      if ((value === undefined || value === '') && p.required) {
+        if (p.type === 'integer' || p.type === 'number' || (p.format && (p.format === 'int64' || p.format === 'int32'))) value = 1;
+        else if (p.type === 'array') value = ['1'];
+        else value = '1';
+      }
+      return value;
+    }
+
+    /**
+     * Converts OpenAPI 3.x or Swagger 2.x spec (object with openapi/swagger + paths) to tool's API list format.
+     * @param {object} spec - OpenAPI or Swagger spec object.
+     * @returns {object[]}
+     */
+    function openApiToApiList(spec) {
+      if (!spec || !spec.paths || typeof spec.paths !== 'object') return [];
+      let baseUrl = '';
+      if (spec.servers && spec.servers[0] && spec.servers[0].url) {
+        baseUrl = spec.servers[0].url.replace(/\/$/, '');
+      } else if (spec.swagger && (spec.host || spec.basePath)) {
+        const scheme = (spec.schemes && spec.schemes[0]) || 'https';
+        const host = (spec.host || '').replace(/\/$/, '');
+        const basePath = (spec.basePath || '').replace(/\/$/, '');
+        baseUrl = host ? (scheme + '://' + host + basePath) : basePath;
+      }
+      const methods = ['get', 'post', 'put', 'delete', 'patch'];
+      const list = [];
+      for (const path of Object.keys(spec.paths)) {
+        const pathItem = spec.paths[path];
+        if (!pathItem || typeof pathItem !== 'object') continue;
+        for (const method of methods) {
+          const op = pathItem[method];
+          if (!op || typeof op !== 'object') continue;
+          const responseCodes = op.responses && typeof op.responses === 'object' ? Object.keys(op.responses).map(k => parseInt(k, 10)).filter(n => !isNaN(n)) : [];
+          const successCode = responseCodes.find(c => c >= 200 && c < 300);
+          const expectedStatus = successCode !== undefined ? successCode : (responseCodes[0] || 200);
+          const name = op.operationId || op.summary || (method.toUpperCase() + ' ' + path);
+          let pathStr = path.startsWith('/') ? path : '/' + path;
+          const params = op.parameters || [];
+          // Path params: replace {param} with default/example value
+          for (const p of params) {
+            if (p && p.in === 'path' && p.name) {
+              const value = getParamValue(p);
+              const placeholder = '{' + p.name + '}';
+              if (value !== undefined && pathStr.indexOf(placeholder) !== -1) {
+                pathStr = pathStr.split(placeholder).join(encodeURIComponent(String(value)));
+              }
+            }
+          }
+
+          // Query params: build ?a=1&b=2 from defaults/examples (helps re-run all APIs consistently)
+          const queryPairs = [];
+          for (const p of params) {
+            if (!p || p.in !== 'query' || !p.name) continue;
+            const value = getParamValue(p);
+            if (value === undefined) continue;
+            if (Array.isArray(value)) {
+              value.forEach(v => queryPairs.push([p.name, String(v)]));
+            } else {
+              queryPairs.push([p.name, String(value)]);
+            }
+          }
+
+          // Header params: add required headers from defaults/examples
+          const headers = {};
+          for (const p of params) {
+            if (!p || p.in !== 'header' || !p.name) continue;
+            const value = getParamValue(p);
+            if (value === undefined) continue;
+            headers[p.name] = String(value);
+          }
+
+          // Best-effort API key header from Swagger securityDefinitions (if present)
+          if (spec.securityDefinitions && op.security) {
+            const apiKeyDef = spec.securityDefinitions.api_key;
+            const needsApiKey = Array.isArray(op.security) && op.security.some(s => s && typeof s === 'object' && Object.prototype.hasOwnProperty.call(s, 'api_key'));
+            if (needsApiKey && apiKeyDef && apiKeyDef.in === 'header' && apiKeyDef.name && !headers[apiKeyDef.name]) {
+              const desc = (spec.info && typeof spec.info.description === 'string') ? spec.info.description : '';
+              headers[apiKeyDef.name] = desc.includes('special-key') ? 'special-key' : 'YOUR_API_KEY';
+            }
+          }
+
+          let body = undefined;
+          for (const p of params) {
+            if (p && p.in === 'body' && (p['x-example'] !== undefined || p.example !== undefined)) {
+              body = p['x-example'] !== undefined ? p['x-example'] : p.example;
+              break;
+            }
+            if (p && p.in === 'body' && p.schema) {
+              body = bodyFromSchema(spec, p.schema);
+              if (body !== undefined) break;
+            }
+          }
+
+          const queryString = queryPairs.length > 0 ? ('?' + new URLSearchParams(queryPairs).toString()) : '';
+          const endpoint = baseUrl + pathStr + queryString;
+          list.push({
+            name: name,
+            method: method.toUpperCase(),
+            endpoint: endpoint,
+            url: endpoint,
+            expectedStatusCode: isNaN(expectedStatus) ? 200 : expectedStatus,
+            headers: headers,
+            body: body
+          });
+        }
+      }
+      return list;
+    }
+
+    /**
+     * Builds a minimal example object from a Swagger/OpenAPI schema (for request body when no x-example).
+     */
+    function bodyFromSchema(spec, schema) {
+      if (!schema || typeof schema !== 'object') return undefined;
+      if (schema['$ref']) {
+        const ref = schema['$ref'];
+        const match = ref.match(/^#\/(definitions|components\/schemas)\/(.+)$/);
+        if (match) {
+          const defs = spec.definitions || spec.components?.schemas || {};
+          const def = defs[match[2]];
+          if (def && def.properties) {
+            const obj = {};
+            for (const key of Object.keys(def.properties)) {
+              const prop = def.properties[key];
+              if (prop.type === 'string') obj[key] = prop.example !== undefined ? prop.example : '';
+              else if (prop.type === 'integer' || prop.type === 'number') obj[key] = prop.example !== undefined ? prop.example : 0;
+              else if (prop.type === 'boolean') obj[key] = prop.example !== undefined ? prop.example : false;
+              else if (prop.type === 'array') obj[key] = prop.items ? [bodyFromSchema(spec, prop.items)] : [];
+              else if (prop['$ref']) obj[key] = bodyFromSchema(spec, prop);
+              else obj[key] = '';
+            }
+            return obj;
+          }
+        }
+        return undefined;
+      }
+      if (schema.type === 'array' && schema.items) {
+        return [bodyFromSchema(spec, schema.items)];
+      }
+      if (schema.type === 'object' && schema.properties) {
+        const obj = {};
+        for (const key of Object.keys(schema.properties)) {
+          obj[key] = bodyFromSchema(spec, schema.properties[key]);
+        }
+        return obj;
+      }
+      return undefined;
+    }
+
+    /**
+     * Returns true if the object looks like an OpenAPI 3.x or Swagger 2.x spec.
+     */
+    function isOpenApiSpec(obj) {
+      return obj && typeof obj === 'object' && (obj.openapi || obj.swagger) && obj.paths && typeof obj.paths === 'object';
+    }
+
+    /**
+     * Recursively finds first non-empty array of objects in obj (max depth 3).
+     */
+    function findArrayInObject(obj, depth) {
+      depth = depth || 0;
+      if (depth > 3 || !obj || typeof obj !== 'object') return null;
+      if (Array.isArray(obj) && obj.length > 0 && typeof obj[0] === 'object' && obj[0] !== null) {
+        return obj;
+      }
+      if (Array.isArray(obj)) return null;
+      for (const key of Object.keys(obj)) {
+        const found = findArrayInObject(obj[key], depth + 1);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    /**
+     * Normalizes various API definition shapes to the format executeApi expects.
+     */
+    function normalizeApiDef(entry) {
+      if (!entry || typeof entry !== 'object') return null;
+      const req = entry.request;
+      if (req && typeof req === 'object') {
+        const url = typeof req.url === 'string' ? req.url : (req.url && req.url.raw);
+        if (req.method || url) {
+          return {
+            name: entry.name || entry.description,
+            method: (req.method || 'GET').toUpperCase(),
+            endpoint: url || entry.url,
+            url: url || entry.url,
+            headers: req.header ? req.header.reduce((acc, h) => { if (h.key) acc[h.key] = h.value || ''; return acc; }, {}) : (req.headers || entry.headers || {}),
+            body: req.body ? (typeof req.body === 'string' ? req.body : req.body.raw) : (entry.body || entry.requestBody),
+            expectedStatusCode: entry.expectedStatusCode || req.expectedStatusCode,
+            expectedResponseKeys: entry.expectedResponseKeys || entry.expectedKeys
+          };
+        }
+      }
+      if (entry.httpMethod || entry.requestMethod) {
+        const method = (entry.httpMethod || entry.requestMethod || 'GET').toUpperCase();
+        const path = entry.path || entry.requestPath || '';
+        const base = entry.baseUrl || entry.baseURL || entry.host || '';
+        const url = entry.url || entry.endpoint || (base + path);
+        if (!url) return null;
+        return {
+          name: entry.name,
+          method,
+          endpoint: url,
+          url,
+          headers: entry.headers || {},
+          body: entry.body || entry.requestBody,
+          expectedStatusCode: entry.expectedStatusCode,
+          expectedResponseKeys: entry.expectedResponseKeys || entry.expectedKeys
+        };
+      }
+      const url = entry.endpoint || entry.url;
+      if (!url) return null;
+      return entry;
+    }
+
+    /**
+     * Parses raw JSON and returns array of API definitions. Accepts:
+     * - Root object: OpenAPI/Swagger spec, or object with apis/apiList/... array.
+     * - Root array: [OpenAPI/Swagger spec], [spec, spec, ...], or [api, api, ...].
+     * @param {object} data - Parsed JSON.
+     * @returns {object[]}
+     */
+    function parseApiList(data) {
+      if (isOpenApiSpec(data)) {
+        const list = openApiToApiList(data);
+        if (list.length > 0) return list;
+      }
+      if (Array.isArray(data)) {
+        if (data.length === 0) throw new Error('JSON array is empty. Add at least one API definition.');
+        const fromSpecs = [];
+        for (const item of data) {
+          if (isOpenApiSpec(item)) fromSpecs.push(...openApiToApiList(item));
+        }
+        if (fromSpecs.length > 0) return fromSpecs;
+        const normalized = data.map(normalizeApiDef).filter(Boolean);
+        if (normalized.length === 0) throw new Error('No valid API in array. Each item needs "method" and "endpoint" (or "url"), or "request": { "method", "url" }.');
+        return normalized;
+      }
+      if (!data || typeof data !== 'object') {
+        throw new Error('JSON must be an array of APIs, an OpenAPI/Swagger spec, or an object containing an array.');
+      }
+      const possibleKeys = ['apis', 'apiList', 'endpoints', 'api', 'requests', 'tests', 'items', 'data', 'list', 'item', 'collection', 'suite', 'cases'];
+      for (const key of possibleKeys) {
+        const value = data[key];
+        if (Array.isArray(value) && value.length > 0) {
+          const fromSpecs = [];
+          for (const item of value) {
+            if (isOpenApiSpec(item)) fromSpecs.push(...openApiToApiList(item));
+          }
+          if (fromSpecs.length > 0) return fromSpecs;
+          const normalized = value.map(normalizeApiDef).filter(Boolean);
+          if (normalized.length > 0) return normalized;
+          throw new Error('Array under "' + key + '" has no valid API entry. Each item needs "method" and "endpoint" (or "url"), or "request": { "method", "url" }.');
+        }
+      }
+      const found = findArrayInObject(data);
+      if (found) {
+        const fromSpecs = [];
+        for (const item of found) {
+          if (isOpenApiSpec(item)) fromSpecs.push(...openApiToApiList(item));
+        }
+        if (fromSpecs.length > 0) return fromSpecs;
+        const normalized = found.map(normalizeApiDef).filter(Boolean);
+        if (normalized.length > 0) return normalized;
+        throw new Error('Found an array but no valid API entry (each item needs "method" + "endpoint"/"url", or "request": { "method", "url" }).');
+      }
+      throw new Error('JSON must be an array of API definitions, an OpenAPI/Swagger spec, or an object with a key like apis, api, requests, tests, item, list, data.');
+    }
+
+    /**
+     * Fetches JSON config from URL and returns parsed array of API definitions.
+     * @param {string} url - URL to JSON file.
+     * @returns {Promise<object[]>}
+     */
+    async function fetchApiConfig(url) {
+      const trimmed = url.trim();
+      if (!trimmed) {
+        throw new Error('Please enter a JSON file URL.');
+      }
+      const response = await fetch(trimmed);
+      if (!response.ok) {
+        throw new Error(`Failed to load JSON: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      return parseApiList(data);
+    }
+
+    /**
+     * Reads uploaded file and returns parsed array of API definitions.
+     * @param {File} file - User-selected JSON file.
+     * @returns {Promise<object[]>}
+     */
+    function loadApiConfigFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            resolve(parseApiList(data));
+          } catch (e) {
+            reject(new Error('Invalid JSON in file: ' + (e.message || 'parse error')));
+          }
+        };
+        reader.onerror = () => reject(new Error('Failed to read file.'));
+        reader.readAsText(file, 'UTF-8');
+      });
+    }
+
+    /**
+     * Runs all APIs from config and returns results plus summary.
+     * @param {object[]} apiList - Array of API definitions.
+     * @returns {Promise<{ results: object[], total: number, passed: number, failed: number, durationMs: number }>}
+     */
+    async function runAllApis(apiList) {
+      const start = performance.now();
+      const results = [];
+      for (const apiDef of apiList) {
+        const result = await executeApi(apiDef);
+        results.push(result);
+      }
+      const durationMs = Math.round(performance.now() - start);
+      const passed = results.filter(r => r.pass).length;
+      const failed = results.length - passed;
+      return {
+        results,
+        total: results.length,
+        passed,
+        failed,
+        durationMs
+      };
+    }
+
+    /**
+     * Renders summary cards (Total, Passed, Failed, Duration).
+     */
+    function renderSummary(data) {
+      summaryEl.innerHTML = `
+        <div class="summary-card total">
+          <div class="value">${data.total}</div>
+          <div class="label">Total APIs</div>
+        </div>
+        <div class="summary-card passed">
+          <div class="value">${data.passed}</div>
+          <div class="label">Passed</div>
+        </div>
+        <div class="summary-card failed">
+          <div class="value">${data.failed}</div>
+          <div class="label">Failed</div>
+        </div>
+        <div class="summary-card duration">
+          <div class="value">${data.durationMs} ms</div>
+          <div class="label">Execution Time</div>
+        </div>
+      `;
+    }
+
+    /**
+     * Builds a short summary from API response body (code, type, message) for quick understanding.
+     */
+    function getResponseSummary(responseBody) {
+      if (!responseBody || typeof responseBody !== 'object') return null;
+      const code = responseBody.code !== undefined ? responseBody.code : responseBody.status;
+      const type = responseBody.type;
+      const message = responseBody.message || responseBody.error || responseBody.detail || responseBody.msg;
+      if (message == null && type == null && code == null) return null;
+      return { code, type, message };
+    }
+
+    /**
+     * Renders a single API result card with clear status comparison and response summary.
+     */
+    function renderApiCard(result) {
+      const card = document.createElement('div');
+      card.className = `api-card ${result.pass ? 'pass' : 'fail'}`;
+      card.dataset.name = result.name;
+
+      const expected = result.expectedStatus;
+      const actual = result.actualStatus;
+      const statusMatch = expected == null || actual === expected;
+      const statusBlock =
+        expected != null
+          ? `
+          <div class="status-code-block">
+            <div class="status-code-item">
+              <span class="label">Expected</span>
+              <span class="code expected">${escapeHtml(String(expected))}</span>
+            </div>
+            <div class="status-code-item">
+              <span class="label">Actual</span>
+              <span class="code actual ${statusMatch ? '' : 'mismatch'}">${actual != null ? escapeHtml(String(actual)) : '—'}</span>
+            </div>
+            ${!statusMatch && actual != null ? '<span class="status-mismatch-hint">← Mismatch</span>' : ''}
+          </div>`
+          : `<div class="status-code-block"><div class="status-code-item"><span class="label">Status</span><span class="code actual">${actual != null ? escapeHtml(String(actual)) : '—'}</span></div></div>`;
+
+      const responseBodyStr = typeof result.responseBody === 'object'
+        ? JSON.stringify(result.responseBody, null, 2)
+        : (result.responseBodyText || '');
+
+      const summary = getResponseSummary(result.responseBody);
+      const summaryBox = summary && (summary.message || summary.type || summary.code !== undefined)
+        ? `
+          <div class="response-summary-box ${result.pass ? '' : 'is-error'}">
+            <div class="summary-title">What the API returned</div>
+            ${summary.message != null ? `<div class="summary-message ${result.pass ? '' : 'highlight'}">${escapeHtml(String(summary.message))}</div>` : ''}
+            ${summary.type != null || summary.code !== undefined
+              ? `<div class="summary-meta">${summary.code !== undefined ? 'Code: ' + escapeHtml(String(summary.code)) : ''}${summary.type != null ? (summary.code !== undefined ? ' · Type: ' : 'Type: ') + escapeHtml(String(summary.type)) : ''}</div>`
+              : ''}
+          </div>`
+        : '';
+
+      card.innerHTML = `
+        <div class="api-card-header">
+          <span class="api-name">${escapeHtml(result.name)}</span>
+          <span class="api-method ${result.method}">${result.method}</span>
+          <span class="api-result-badge ${result.pass ? 'pass' : 'fail'}">${result.pass ? 'Pass' : 'Fail'}</span>
+        </div>
+        <div class="api-card-body">
+          <div class="api-details">
+            <div class="api-detail-row">
+              <span class="key">Method & URL</span>
+              <span class="value">${result.method} ${escapeHtml(result.url)}</span>
+            </div>
+            <div class="api-detail-row">
+              <span class="key">Status Code</span>
+              <span class="value">${statusBlock}</span>
+            </div>
+            <div class="api-detail-row">
+              <span class="key">Response Time</span>
+              <span class="value">${result.responseTimeMs != null ? result.responseTimeMs + ' ms' : '—'}</span>
+            </div>
+            ${result.reason ? `<div class="api-detail-row"><span class="key">Why it failed</span><span class="value fail-reason">${escapeHtml(result.reason)}</span></div>` : ''}
+          </div>
+          ${summaryBox}
+          ${responseBodyStr ? `
+            <div class="response-body-toggle" data-toggle="body">▼ Show full response body</div>
+            <pre class="response-body-content">${escapeHtml(responseBodyStr)}</pre>
+          ` : ''}
+          <div class="edit-rerun-wrap">
+            <button type="button" class="edit-rerun-btn" data-action="edit">Edit & re-run</button>
+            <div class="edit-rerun-panel" data-panel="edit">
+              <div class="panel-title">Update request data and re-run this API</div>
+              <div class="edit-rerun-row">
+                <label>URL</label>
+                <input type="text" data-edit="url" />
+              </div>
+              <div class="edit-rerun-row">
+                <label>Headers (JSON)</label>
+                <textarea data-edit="headers" placeholder='{"Content-Type":"application/json"}'></textarea>
+              </div>
+              <div class="edit-rerun-row" data-body-row>
+                <label>Request body (JSON)</label>
+                <textarea data-edit="body" placeholder='{}'></textarea>
+              </div>
+              <div class="edit-rerun-actions">
+                <button type="button" class="btn btn-primary" data-action="rerun">Re-run</button>
+                <button type="button" class="btn btn-secondary" data-action="cancel-edit">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      card._result = result;
+      const header = card.querySelector('.api-card-header');
+      const toggleBtn = card.querySelector('[data-toggle="body"]');
+      const bodyContent = card.querySelector('.response-body-content');
+      const editBtn = card.querySelector('[data-action="edit"]');
+      const panel = card.querySelector('[data-panel="edit"]');
+      const urlInput = card.querySelector('[data-edit="url"]');
+      const headersInput = card.querySelector('[data-edit="headers"]');
+      const bodyInput = card.querySelector('[data-edit="body"]');
+      const bodyRow = card.querySelector('[data-body-row]');
+      const methodsWithBody = ['POST', 'PUT', 'PATCH'];
+      if (bodyRow && !methodsWithBody.includes(result.method)) bodyRow.style.display = 'none';
+
+      header.addEventListener('click', () => {
+        card.classList.toggle('expanded');
+      });
+
+      if (toggleBtn && bodyContent) {
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          bodyContent.classList.toggle('visible');
+          toggleBtn.textContent = bodyContent.classList.contains('visible')
+            ? '▲ Hide full response body'
+            : '▼ Show full response body';
+        });
+        if (!result.pass) {
+          card.classList.add('expanded');
+          bodyContent.classList.add('visible');
+          toggleBtn.textContent = '▲ Hide full response body';
+        }
+      } else if (!result.pass) {
+        card.classList.add('expanded');
+      }
+
+      function openEditPanel() {
+        const r = card._result;
+        urlInput.value = r.url || '';
+        headersInput.value = typeof r.requestHeaders === 'object' && r.requestHeaders !== null
+          ? JSON.stringify(r.requestHeaders, null, 2)
+          : '{}';
+        bodyInput.value = r.requestBody != null
+          ? (typeof r.requestBody === 'string' ? r.requestBody : JSON.stringify(r.requestBody, null, 2))
+          : '{}';
+        panel.classList.add('visible');
+      }
+
+      function closeEditPanel() {
+        panel.classList.remove('visible');
+      }
+
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (panel.classList.contains('visible')) closeEditPanel();
+        else openEditPanel();
+      });
+
+      card.querySelector('[data-action="cancel-edit"]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeEditPanel();
+      });
+
+      const rerunBtn = card.querySelector('[data-action="rerun"]');
+      rerunBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const url = urlInput.value.trim();
+        if (!url) return;
+        let headers = {};
+        try {
+          const h = headersInput.value.trim();
+          if (h) headers = JSON.parse(h);
+        } catch (err) {
+          alert('Invalid JSON in Headers');
+          return;
+        }
+        let body = undefined;
+        if (bodyRow && bodyRow.style.display !== 'none') {
+          const b = bodyInput.value.trim();
+          if (b) {
+            try {
+              body = JSON.parse(b);
+            } catch (err) {
+              alert('Invalid JSON in Request body');
+              return;
+            }
+          }
+        }
+        const apiDef = {
+          name: card._result.name,
+          method: card._result.method,
+          endpoint: url,
+          url: url,
+          expectedStatusCode: card._result.expectedStatus,
+          headers: headers,
+          body: body
+        };
+        editBtn.disabled = true;
+        rerunBtn.textContent = 'Running…';
+        try {
+          const newResult = await executeApi(apiDef);
+          const newCard = renderApiCard(newResult);
+          newCard._result = newResult;
+          if (card.parentNode) card.parentNode.replaceChild(newCard, card);
+          if (lastRunData) {
+            const idx = lastRunData.results.findIndex(res => res.name === newResult.name && res.url === card._result.url);
+            if (idx !== -1) {
+              lastRunData.results[idx] = newResult;
+              lastRunData.passed = lastRunData.results.filter(r => r.pass).length;
+              lastRunData.failed = lastRunData.results.length - lastRunData.passed;
+              renderSummary(lastRunData);
+            }
+          }
+        } catch (err) {
+          editBtn.disabled = false;
+          rerunBtn.textContent = 'Re-run';
+          showError(err.message || 'Re-run failed');
+        }
+      });
+
+      return card;
+    }
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    const filterTabsEl = document.getElementById('filterTabs');
+
+    /**
+     * Applies filter: all or failed-only.
+     */
+    function applyFilter(filter) {
+      const cards = apiListEl.querySelectorAll('.api-card');
+      cards.forEach(c => {
+        const isFail = c.classList.contains('fail');
+        c.style.display = filter === 'failed' && !isFail ? 'none' : '';
+      });
+      filterTabsEl.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+    }
+
+    /**
+     * Renders full results: summary + list of API cards.
+     */
+    function renderResults(data) {
+      lastRunData = data;
+      renderSummary(data);
+      apiListEl.innerHTML = '';
+      data.results.forEach(r => {
+        apiListEl.appendChild(renderApiCard(r));
+      });
+      filterTabsEl.style.display = 'flex';
+      filterTabsEl.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === 'all');
+      });
+      applyFilter('all');
+      resultsSection.classList.add('visible');
+    }
+
+    /**
+     * Returns report payload for HTML export (reads from current DOM).
+     */
+    function getReportDataForHtml() {
+      const cards = document.querySelectorAll('.api-card');
+      const results = [];
+      cards.forEach(card => {
+        const name = card.dataset.name;
+        const header = card.querySelector('.api-card-header');
+        const badge = header.querySelector('.api-result-badge');
+        const details = card.querySelectorAll('.api-detail-row');
+        let methodUrl = '', statusCode = '', responseTime = '', reason = '';
+        details.forEach(row => {
+          const key = row.querySelector('.key').textContent.trim();
+          const value = row.querySelector('.value').textContent.trim();
+          if (key.includes('Method')) methodUrl = value;
+          else if (key.includes('Status')) statusCode = value;
+          else if (key.includes('Response Time')) responseTime = value;
+          else if (key.includes('Failure')) reason = value;
+        });
+        results.push({
+          apiName: name,
+          methodAndUrl: methodUrl,
+          statusCode,
+          responseTime,
+          result: badge ? badge.textContent.trim() : '',
+          failureReason: reason || null
+        });
+      });
+      const summaryCards = document.querySelectorAll('.summary-card .value');
+      const total = summaryCards[0] ? summaryCards[0].textContent : '0';
+      const passed = summaryCards[1] ? summaryCards[1].textContent : '0';
+      const failed = summaryCards[2] ? summaryCards[2].textContent : '0';
+      const duration = summaryCards[3] ? summaryCards[3].textContent : '0';
+      return {
+        summary: { total, passed, failed, executionTime: duration },
+        results
+      };
+    }
+
+    /**
+     * Triggers download of report as JSON file (full run data including response bodies).
+     */
+    function downloadReportJson() {
+      const data = lastRunData
+        ? {
+            summary: {
+              total: lastRunData.total,
+              passed: lastRunData.passed,
+              failed: lastRunData.failed,
+              executionTimeMs: lastRunData.durationMs
+            },
+            results: lastRunData.results
+          }
+        : { summary: {}, results: [] };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `api-test-report-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    /**
+     * Generates a static HTML report and triggers download.
+     */
+    function downloadReportHtml() {
+      const data = getReportDataForHtml();
+      const rows = data.results.map(r => `
+        <tr class="${r.result === 'Pass' ? 'pass' : 'fail'}">
+          <td>${escapeHtml(r.apiName)}</td>
+          <td>${escapeHtml(r.methodAndUrl)}</td>
+          <td>${escapeHtml(r.statusCode)}</td>
+          <td>${escapeHtml(r.responseTime)}</td>
+          <td>${r.result}</td>
+          <td>${escapeHtml(r.failureReason || '—')}</td>
+        </tr>
+      `).join('');
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>API Test Report</title>
+<style>
+  body { font-family: sans-serif; margin: 1rem; background: #0f1419; color: #e6edf3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #2d3a4d; padding: 0.5rem 0.75rem; text-align: left; }
+  th { background: #1a2332; }
+  tr.pass { border-left: 4px solid #3fb950; }
+  tr.fail { border-left: 4px solid #f85149; }
+  .summary { margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+  <div class="summary">
+    <strong>Summary:</strong> Total: ${data.summary.total} | Passed: ${data.summary.passed} | Failed: ${data.summary.failed} | Time: ${data.summary.executionTime}
+  </div>
+  <table>
+    <thead><tr><th>API Name</th><th>Method & URL</th><th>Status Code</th><th>Response Time</th><th>Result</th><th>Failure Reason</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+</body>
+</html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `api-test-report-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.html`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    /**
+     * Main flow: load config from file (if selected) or URL, run APIs, render results, handle errors.
+     */
+    async function runTests() {
+      hideError();
+      const hasFile = jsonFileInput.files && jsonFileInput.files.length > 0;
+      const url = jsonUrlInput.value.trim();
+
+      if (!hasFile && !url) {
+        showError('Please enter a JSON file URL or upload a JSON file.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      loader.classList.add('visible');
+      resultsSection.classList.remove('visible');
+
+      try {
+        let apiList = hasFile
+          ? await loadApiConfigFromFile(jsonFileInput.files[0])
+          : await fetchApiConfig(url);
+        const baseUrl = baseUrlInput.value.trim().replace(/\/$/, '');
+        const basePathRaw = basePathInput.value.trim();
+        const isAbsoluteUrl = (s) => s.startsWith('http://') || s.startsWith('https://');
+        const basePath = basePathRaw && !isAbsoluteUrl(basePathRaw)
+          ? (basePathRaw.startsWith('/') ? basePathRaw.replace(/\/$/, '') : '/' + basePathRaw.replace(/\/$/, ''))
+          : '';
+        if (baseUrl || basePath) {
+          apiList = apiList.map(api => {
+            const urlOrPath = (api.endpoint || api.url || '').trim();
+            if (!urlOrPath) return api;
+            if (urlOrPath.startsWith('http://') || urlOrPath.startsWith('https://')) {
+              return api;
+            }
+            if (urlOrPath.startsWith('/')) {
+              const pathPart = urlOrPath;
+              const full = (baseUrl || '') + basePath + pathPart;
+              return { ...api, endpoint: full, url: full };
+            }
+            const pathPart = '/' + urlOrPath;
+            const full = (baseUrl || '') + basePath + pathPart;
+            return { ...api, endpoint: full, url: full };
+          });
+        }
+        const data = await runAllApis(apiList);
+        renderResults(data);
+      } catch (err) {
+        showError(err.message || 'An error occurred while running tests.');
+      } finally {
+        submitBtn.disabled = false;
+        loader.classList.remove('visible');
+      }
+    }
+
+    // --- Event listeners ---
+    jsonFileInput.addEventListener('change', () => {
+      fileNameEl.textContent = jsonFileInput.files && jsonFileInput.files[0]
+        ? jsonFileInput.files[0].name
+        : 'No file chosen';
+    });
+    submitBtn.addEventListener('click', runTests);
+    jsonUrlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runTests();
+    });
+    downloadJsonBtn.addEventListener('click', downloadReportJson);
+    downloadHtmlBtn.addEventListener('click', downloadReportHtml);
+    filterTabsEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-filter');
+      if (btn) applyFilter(btn.dataset.filter);
+    });
+  </script>
+</body>
+</html>

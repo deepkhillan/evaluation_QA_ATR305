@@ -1,0 +1,3094 @@
+[{
+    "openapi": "3.0.0",
+    "paths": {
+      "/api/users/v2/user/signup": {
+        "post": {
+          "operationId": "UserController_register",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateUserDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/help": {
+        "post": {
+          "operationId": "UserController_contactUs",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactUsDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/login": {
+        "post": {
+          "operationId": "UserController_userLogin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLoginDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/forgotPassword": {
+        "post": {
+          "operationId": "UserController_forgetPassword",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgetPasswordDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/resetPassword": {
+        "post": {
+          "operationId": "UserController_resetPassword",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/verifyEmail": {
+        "post": {
+          "operationId": "UserController_verifyEmail",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifyEmailDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/userType": {
+        "get": {
+          "operationId": "UserController_userType",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/resendVerificationEmail": {
+        "post": {
+          "operationId": "UserController_resendVerificationEmail",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resendVerificationEmailDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/login/sendToken": {
+        "post": {
+          "operationId": "UserController_userLoginSendToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/loginSendTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/login/verifyToken": {
+        "post": {
+          "operationId": "UserController_userLoginVerifyToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/loginVerifyTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/validate2fa": {
+        "post": {
+          "operationId": "UserController_validate2faToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/validate2faTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/lost2fa": {
+        "post": {
+          "operationId": "UserController_userLost2fa",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/lost2faTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/sendToken": {
+        "post": {
+          "operationId": "UserController_sendToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sendTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/socialLogin": {
+        "post": {
+          "operationId": "UserController_socialLogin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/socialLoginDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/logout": {
+        "get": {
+          "operationId": "UserController_userLogout",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/refreshToken": {
+        "post": {
+          "operationId": "UserController_refreshToken",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/accountCreate": {
+        "get": {
+          "operationId": "UserController_accountCreate",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/authneticateDevice": {
+        "post": {
+          "operationId": "UserController_authneticateDevice",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/defaultLanguage": {
+        "put": {
+          "operationId": "UserController_updateDefaultLanguage",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        },
+        "get": {
+          "operationId": "UserController_getDefaultLanguage",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/verify2fa": {
+        "post": {
+          "operationId": "UserController_verify2fa",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/sendWithdrawToken": {
+        "post": {
+          "operationId": "UserController_sendWithdrawToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sendWithdrawTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/whatsMyIp": {
+        "get": {
+          "operationId": "UserController_whatsMyIp",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/atmLogin": {
+        "post": {
+          "operationId": "UserController_atmLogin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtmLoginDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users",
+            "ATM"
+          ]
+        }
+      },
+      "/api/users/v2/user/pin": {
+        "get": {
+          "operationId": "UserController_getPin",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        },
+        "post": {
+          "operationId": "UserController_setUpdatePin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetUpdatePinDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        },
+        "delete": {
+          "operationId": "UserController_removePin",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/forgotPin": {
+        "post": {
+          "operationId": "UserController_forgotPin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPinDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/resetPin": {
+        "post": {
+          "operationId": "UserController_forgotResetPin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPinDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/login/bioMetrics": {
+        "post": {
+          "operationId": "UserController_loginBiometrics",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginBioMetricDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/app/management": {
+        "get": {
+          "operationId": "UserController_appManagementSetting",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/agent/list": {
+        "get": {
+          "operationId": "UserController_agentList",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/agent/updateMasterLiquidity": {
+        "post": {
+          "operationId": "UserController_updateMasterLiquidity",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMasterAutoLiquidityUpdateDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/agent/resendRequest": {
+        "get": {
+          "operationId": "UserController_agentResendRequest",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/emailExists": {
+        "get": {
+          "operationId": "UserController_emailExists",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/withdraw/validate2fa": {
+        "post": {
+          "operationId": "UserController_validateWithdraw2faToken",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/account/delete": {
+        "get": {
+          "operationId": "UserController_deleteUserAccount",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/announcement": {
+        "get": {
+          "operationId": "UserController_getAnnouncement",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/emailVerify": {
+        "post": {
+          "operationId": "UserController_userVerifyEmail",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/emailVerifyDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/verifyPin": {
+        "post": {
+          "operationId": "UserController_verifyPin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifyPinDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/email/sendToken": {
+        "post": {
+          "operationId": "UserController_emailVerifySendToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/loginSendTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/forgotPinAfterLogin": {
+        "get": {
+          "operationId": "UserController_forgotPinAfterLogin",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/user/notification": {
+        "get": {
+          "operationId": "NotificationController_getNotification",
+          "parameters": [
+            {
+              "name": "limit",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "number"
+              }
+            },
+            {
+              "name": "page",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "number"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        },
+        "put": {
+          "operationId": "NotificationController_updateNotification",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateNotificationDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/passkey/register": {
+        "get": {
+          "operationId": "PasskeyController_initiatePasskeyRegister",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/passkey/register/verify": {
+        "post": {
+          "operationId": "PasskeyController_verifyRegistration",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasskeyVerifyRegistrationDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/passkey/login": {
+        "get": {
+          "operationId": "PasskeyController_initiatePasskeyLogin",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/passkey/login/verify": {
+        "post": {
+          "operationId": "PasskeyController_verifyLogin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasskeyVerifyLoginDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/passkey/disable": {
+        "get": {
+          "operationId": "PasskeyController_passkeyDisable",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/user/list": {
+        "post": {
+          "operationId": "AdminUsersController_userListDetails",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/user/listByKycLevel": {
+        "post": {
+          "operationId": "AdminUsersController_userListByKycDetails",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/user/count": {
+        "get": {
+          "operationId": "AdminUsersController_userListCount",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/user/kyc/status": {
+        "put": {
+          "operationId": "AdminUsersController_updateKycStatus",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/user/blockUnblock": {
+        "put": {
+          "operationId": "AdminUsersController_updateBlockStatus",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/user/activity/{userId}": {
+        "get": {
+          "operationId": "AdminUsersController_getUserActivityLogs",
+          "parameters": [
+            {
+              "name": "userId",
+              "required": true,
+              "in": "path",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "page",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "number"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_users"
+          ]
+        }
+      },
+      "/api/users/v2/admin/login": {
+        "post": {
+          "operationId": "AdminController_adminLogin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminLoginDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/login/verifyToken": {
+        "post": {
+          "operationId": "AdminController_userLoginVerifyToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminLoginVerifyTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/sendToken": {
+        "post": {
+          "operationId": "AdminController_adminLoginSendToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminSendTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/validate2fa": {
+        "post": {
+          "operationId": "AdminController_validate2faToken",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminValidate2faTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/lost2fa": {
+        "post": {
+          "operationId": "AdminController_userLost2fa",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminLost2faTokenDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/logout": {
+        "get": {
+          "operationId": "AdminController_adminLogout",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/subAdmin": {
+        "get": {
+          "operationId": "AdminController_getSubAdmin",
+          "parameters": [
+            {
+              "name": "page",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "number"
+              }
+            },
+            {
+              "name": "email",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "country",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "isExport",
+              "required": true,
+              "in": "query",
+              "schema": {
+                "type": "number"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        },
+        "post": {
+          "operationId": "AdminController_addSubAdmin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubAdminDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        },
+        "put": {
+          "operationId": "AdminController_updateSubAdmin",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSubAdminDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        },
+        "patch": {
+          "operationId": "AdminController_updateSubAdminStatus",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/menus": {
+        "get": {
+          "operationId": "AdminController_getAccessMenus",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/userLevelDetail": {
+        "get": {
+          "operationId": "AdminController_getDashboardUsersLevelsDetails",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/userCountrytChartDetail": {
+        "get": {
+          "operationId": "AdminController_getDashboardUsersCountryDetails",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/apiDocument": {
+        "get": {
+          "operationId": "AdminController_getApiDocument",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/dbDocument": {
+        "get": {
+          "operationId": "AdminController_getDbSchema",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/dbList": {
+        "get": {
+          "operationId": "AdminController_getDbList",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/exportDb": {
+        "get": {
+          "operationId": "AdminController_exportDatabase",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/userCountryAccess": {
+        "get": {
+          "operationId": "AdminController_getUserCountryAccess",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        },
+        "put": {
+          "operationId": "AdminController_userCountryAccess",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/account/subadmin/delete": {
+        "post": {
+          "operationId": "AdminController_deleteSubAdminAccount",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/admin/sendEmailToUser": {
+        "post": {
+          "operationId": "AdminController_sendEmailToUser",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin"
+          ]
+        }
+      },
+      "/api/users/v2/setting/2fa": {
+        "get": {
+          "operationId": "SettingController_google2fa",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Setting"
+          ]
+        },
+        "put": {
+          "operationId": "SettingController_enableDisable2fa",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/generate2faDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Setting"
+          ]
+        }
+      },
+      "/api/users/v2/setting/changePassword": {
+        "put": {
+          "operationId": "SettingController_changePassword",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/changePasswordDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Setting"
+          ]
+        }
+      },
+      "/api/users/v2/setting/accountDeactivate": {
+        "put": {
+          "operationId": "SettingController_deactivateUserAccount",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Setting"
+          ]
+        }
+      },
+      "/api/users/v2/setting/getInviteLink": {
+        "get": {
+          "operationId": "SettingController_getInviteLink",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Setting"
+          ]
+        }
+      },
+      "/api/users/v2/setting/sendInviteEmail": {
+        "post": {
+          "operationId": "SettingController_sendInviteEmail",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/sendInviteEmailDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Setting"
+          ]
+        }
+      },
+      "/api/users/status": {
+        "get": {
+          "operationId": "HealthcheckController_healthCheck",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Health check"
+          ]
+        }
+      },
+      "/api/users/v2/file/upload": {
+        "post": {
+          "operationId": "FileController_fileUpload",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Files"
+          ]
+        }
+      },
+      "/api/users/v2/file/uploadProfilePic": {
+        "post": {
+          "operationId": "FileController_profilePicUpload",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Files"
+          ]
+        }
+      },
+      "/api/users/v2/file/{fileId}": {
+        "get": {
+          "operationId": "FileController_getFileById",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Files"
+          ]
+        }
+      },
+      "/api/users/v2/kyc/kycInfo": {
+        "put": {
+          "operationId": "KycController_updateKycInfo",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/updateKycUserInfoDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Kyc"
+          ]
+        },
+        "get": {
+          "operationId": "KycController_getKycInfo",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Kyc"
+          ]
+        }
+      },
+      "/api/users/v2/kyc/kycMobile": {
+        "put": {
+          "operationId": "KycController_updateKycMobile",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/updateKycMobileDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Kyc"
+          ]
+        }
+      },
+      "/api/users/v2/kyc/kycVerify": {
+        "put": {
+          "operationId": "KycController_updateKycVerify",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/updateKycVerifyDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Kyc"
+          ]
+        }
+      },
+      "/api/users/v2/kyc/kycMetamap": {
+        "post": {
+          "operationId": "KycController_updateKycMetamap",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Kyc"
+          ]
+        }
+      },
+      "/api/users/v2/kyc/availUsername/{nickname}": {
+        "get": {
+          "operationId": "KycController_availUsername",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "User_Kyc"
+          ]
+        }
+      },
+      "/api/users/v2/admin/2fa": {
+        "get": {
+          "operationId": "AdminSettingsController_generate2FaDetails",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_settings"
+          ]
+        },
+        "put": {
+          "operationId": "AdminSettingsController_enable2FA",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/enableDisable2faDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_settings"
+          ]
+        }
+      },
+      "/api/users/v2/admin/changePassword": {
+        "patch": {
+          "operationId": "AdminSettingsController_changePassword",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminChangePasswordDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_settings"
+          ]
+        }
+      },
+      "/api/users/v2/admin/upload": {
+        "post": {
+          "operationId": "AdminSettingsController_adminProfilePicUpload",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_settings"
+          ]
+        }
+      },
+      "/api/users/v2/admin/details": {
+        "get": {
+          "operationId": "AdminSettingsController_getAdminDetails",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_settings"
+          ]
+        }
+      },
+      "/api/users/v2/admin/file/upload": {
+        "post": {
+          "operationId": "AdminSettingsController_fileUpload",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_settings"
+          ]
+        }
+      },
+      "/api/users/v2/admin/agent/list": {
+        "post": {
+          "operationId": "AdminAgentController_agentListDetails",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_agent"
+          ]
+        }
+      },
+      "/api/users/v2/admin/agent/statusUpdate": {
+        "post": {
+          "operationId": "AdminAgentController_updateAgentStatus",
+          "parameters": [],
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin_agent"
+          ]
+        }
+      },
+      "/api/users/v2/admin/announcement": {
+        "post": {
+          "operationId": "AdminAnnouncementsController_addUpdateAnnouncement",
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAdminAnnouncementDto"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin-announcements"
+          ]
+        },
+        "get": {
+          "operationId": "AdminAnnouncementsController_getAnnouncement",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Admin-announcements"
+          ]
+        }
+      }
+    },
+    "info": {
+      "title": "RapiXchange Users API document",
+      "version": "2.0",
+      "contact": {}
+    },
+    "tags": [],
+    "servers": [],
+    "components": {
+      "schemas": {
+        "CreateUserDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "password": {
+              "type": "string",
+              "description": "Enter a secure password (must contain uppercase, lowercase, number, special character, and be between 8-30 characters long)"
+            },
+            "accountType": {
+              "type": "string",
+              "description": "Select Account type"
+            },
+            "name": {
+              "type": "string",
+              "description": "Enter name"
+            },
+            "mobile": {
+              "type": "string",
+              "description": "Enter Mobile number"
+            },
+            "country": {
+              "type": "string",
+              "description": "Enter Country"
+            },
+            "language": {
+              "type": "string",
+              "description": "Enter Country"
+            },
+            "code": {
+              "type": "string",
+              "description": "Enter refferal code."
+            },
+            "registeredBy": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "number"
+            },
+            "deviceToken": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email",
+            "password",
+            "accountType",
+            "name",
+            "mobile",
+            "country",
+            "language",
+            "registeredBy",
+            "deviceType",
+            "deviceToken",
+            "captchaText"
+          ]
+        },
+        "ContactUsDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "name": {
+              "type": "string",
+              "description": "Enter name"
+            },
+            "subject": {
+              "type": "string",
+              "description": "Enter subject"
+            },
+            "message": {
+              "type": "string",
+              "description": "Enter message"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "isLogin": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "email",
+            "name",
+            "subject",
+            "message",
+            "captchaText",
+            "isLogin"
+          ]
+        },
+        "UserLoginDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "password": {
+              "type": "string",
+              "description": "Enter password"
+            },
+            "accountType": {
+              "type": "string",
+              "description": "Enter account type"
+            },
+            "language": {
+              "type": "string",
+              "description": "Enter language"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "ip": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email",
+            "password",
+            "accountType",
+            "language",
+            "captchaText",
+            "ip",
+            "deviceType",
+            "deviceToken"
+          ]
+        },
+        "ForgetPasswordDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "language": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email",
+            "language",
+            "captchaText"
+          ]
+        },
+        "ResetPasswordDto": {
+          "type": "object",
+          "properties": {
+            "hash": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string",
+              "description": "Enter password"
+            },
+            "language": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "hash",
+            "password",
+            "language",
+            "captchaText"
+          ]
+        },
+        "verifyEmailDto": {
+          "type": "object",
+          "properties": {
+            "hash": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "hash",
+            "language",
+            "captchaText"
+          ]
+        },
+        "resendVerificationEmailDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "language": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email",
+            "language"
+          ]
+        },
+        "loginSendTokenDto": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "token",
+            "language",
+            "captchaText"
+          ]
+        },
+        "loginVerifyTokenDto": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "ip": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "token",
+            "language",
+            "code",
+            "captchaText",
+            "ip",
+            "deviceType",
+            "deviceToken"
+          ]
+        },
+        "validate2faTokenDto": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "ip": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "language",
+            "code",
+            "captchaText",
+            "ip",
+            "deviceType",
+            "deviceToken"
+          ]
+        },
+        "lost2faTokenDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          }
+        },
+        "sendTokenDto": {
+          "type": "object",
+          "properties": {
+            "mobileNo": {
+              "type": "string",
+              "description": "Enter mobileno"
+            },
+            "phoneCode": {
+              "type": "string",
+              "description": "Enter phone_code"
+            },
+            "otpType": {
+              "type": "string",
+              "description": "Enter otp type"
+            },
+            "communicationType": {
+              "type": "string",
+              "description": "Enter otp send type(mobile or email)"
+            }
+          },
+          "required": [
+            "phoneCode",
+            "otpType",
+            "communicationType"
+          ]
+        },
+        "socialLoginDto": {
+          "type": "object",
+          "properties": {
+            "clientId": {
+              "type": "string"
+            },
+            "credential": {
+              "type": "string"
+            },
+            "select_by": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "deviceToken": {
+              "type": "string"
+            },
+            "accountType": {
+              "type": "string",
+              "description": "Select Account type"
+            },
+            "ip": {
+              "type": "string"
+            },
+            "socialType": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "clientId",
+            "credential",
+            "select_by",
+            "captchaText",
+            "language",
+            "deviceType",
+            "deviceToken",
+            "accountType",
+            "ip",
+            "socialType"
+          ]
+        },
+        "sendWithdrawTokenDto": {
+          "type": "object",
+          "properties": {
+            "otpType": {
+              "type": "string",
+              "description": "Enter otp type"
+            }
+          },
+          "required": [
+            "otpType"
+          ]
+        },
+        "AtmLoginDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "password": {
+              "type": "string",
+              "description": "Enter password"
+            },
+            "language": {
+              "type": "string",
+              "description": "Enter language"
+            },
+            "ip": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email",
+            "password",
+            "language",
+            "ip"
+          ]
+        },
+        "SetUpdatePinDto": {
+          "type": "object",
+          "properties": {
+            "pin": {
+              "type": "string",
+              "description": "Enter pin",
+              "minLength": 6,
+              "maxLength": 6
+            },
+            "token": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "number"
+            },
+            "deviceToken": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "pin",
+            "token",
+            "deviceType",
+            "deviceToken",
+            "captchaText",
+            "language"
+          ]
+        },
+        "ForgotPinDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token"
+          ]
+        },
+        "ResetPinDto": {
+          "type": "object",
+          "properties": {
+            "oldPin": {
+              "type": "string",
+              "description": "Enter old pin"
+            },
+            "newPin": {
+              "type": "string",
+              "description": "Enter new pin"
+            }
+          },
+          "required": [
+            "oldPin",
+            "newPin"
+          ]
+        },
+        "LoginBioMetricDto": {
+          "type": "object",
+          "properties": {
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "deviceToken"
+          ]
+        },
+        "AgentMasterAutoLiquidityUpdateDto": {
+          "type": "object",
+          "properties": {
+            "autoLiquidity": {
+              "type": "string",
+              "description": "Enter autoLiquidity(\"0/1\")"
+            },
+            "liquidityCurrency": {
+              "type": "string",
+              "description": "Enter liquidityCurrency"
+            }
+          },
+          "required": [
+            "autoLiquidity"
+          ]
+        },
+        "emailVerifyDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "otp": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            },
+            "isNewUser": {
+              "type": "boolean"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token",
+            "otp",
+            "language",
+            "isNewUser",
+            "captchaText"
+          ]
+        },
+        "verifyPinDto": {
+          "type": "object",
+          "properties": {
+            "pin": {
+              "type": "string",
+              "description": "Enter pin",
+              "minLength": 6,
+              "maxLength": 6
+            },
+            "token": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "number"
+            },
+            "deviceToken": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "language": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "pin",
+            "token",
+            "deviceType",
+            "deviceToken",
+            "captchaText",
+            "language"
+          ]
+        },
+        "UpdateNotificationDto": {
+          "type": "object",
+          "properties": {
+            "notificationId": {
+              "type": "string",
+              "description": "Please enter notification id"
+            }
+          },
+          "required": [
+            "notificationId"
+          ]
+        },
+        "PasskeyVerifyRegistrationRespItem": {
+          "type": "object",
+          "properties": {
+            "clientDataJSON": {
+              "type": "string"
+            },
+            "attestationObject": {
+              "type": "string"
+            },
+            "authenticatorData": {
+              "type": "string"
+            },
+            "transports": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "publicKeyAlgorithm": {
+              "type": "string"
+            },
+            "publicKey": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "clientDataJSON",
+            "attestationObject"
+          ]
+        },
+        "PasskeyVerifyRegistrationCredPropsItem": {
+          "type": "object",
+          "properties": {
+            "rk": {
+              "type": "boolean"
+            }
+          }
+        },
+        "PasskeyVerifyRegistrationAuthenticationExtensionItem": {
+          "type": "object",
+          "properties": {
+            "appid": {
+              "type": "string"
+            },
+            "hmacCreateSecret": {
+              "type": "boolean"
+            },
+            "credProps": {
+              "$ref": "#/components/schemas/PasskeyVerifyRegistrationCredPropsItem"
+            }
+          }
+        },
+        "PasskeyVerifyRegistrationDto": {
+          "type": "object",
+          "properties": {
+            "challenge": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "rawId": {
+              "type": "string"
+            },
+            "response": {
+              "$ref": "#/components/schemas/PasskeyVerifyRegistrationRespItem"
+            },
+            "authenticatorAttachment": {
+              "type": "string"
+            },
+            "clientExtensionResults": {
+              "$ref": "#/components/schemas/PasskeyVerifyRegistrationAuthenticationExtensionItem"
+            },
+            "type": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "challenge",
+            "id",
+            "rawId",
+            "response",
+            "clientExtensionResults",
+            "type",
+            "deviceType"
+          ]
+        },
+        "PasskeyVerifyLoginRespItem": {
+          "type": "object",
+          "properties": {
+            "clientDataJSON": {
+              "type": "string"
+            },
+            "authenticatorData": {
+              "type": "string"
+            },
+            "signature": {
+              "type": "string"
+            },
+            "userHandle": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "clientDataJSON",
+            "authenticatorData",
+            "signature"
+          ]
+        },
+        "PasskeyVerifyLoginAuthenticationExtensionItem": {
+          "type": "object",
+          "properties": {
+            "appid": {
+              "type": "string"
+            },
+            "hmacCreateSecret": {
+              "type": "boolean"
+            },
+            "credProps": {
+              "$ref": "#/components/schemas/PasskeyVerifyRegistrationCredPropsItem"
+            }
+          }
+        },
+        "PasskeyVerifyLoginDto": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "rawId": {
+              "type": "string"
+            },
+            "response": {
+              "$ref": "#/components/schemas/PasskeyVerifyLoginRespItem"
+            },
+            "authenticatorAttachment": {
+              "type": "string"
+            },
+            "clientExtensionResults": {
+              "$ref": "#/components/schemas/PasskeyVerifyLoginAuthenticationExtensionItem"
+            },
+            "type": {
+              "type": "string"
+            },
+            "challenge": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "number"
+            },
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "deviceType",
+            "deviceToken"
+          ]
+        },
+        "adminLoginDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "password": {
+              "type": "string",
+              "description": "Enter password"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "ip": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email",
+            "password",
+            "captchaText",
+            "ip"
+          ]
+        },
+        "adminLoginVerifyTokenDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token",
+            "code",
+            "captchaText",
+            "deviceType",
+            "deviceToken"
+          ]
+        },
+        "adminSendTokenDto": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "token",
+            "captchaText"
+          ]
+        },
+        "adminValidate2faTokenDto": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string"
+            },
+            "deviceToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "token",
+            "code",
+            "captchaText",
+            "deviceType",
+            "deviceToken"
+          ]
+        },
+        "adminLost2faTokenDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "captchaText": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token",
+            "captchaText"
+          ]
+        },
+        "SubAdminDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Enter email"
+            },
+            "password": {
+              "type": "string",
+              "description": "Enter password"
+            },
+            "name": {
+              "type": "string",
+              "description": "Enter name"
+            },
+            "country": {
+              "type": "string",
+              "description": "Enter Country"
+            },
+            "access": {
+              "description": "Menu List",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "email",
+            "password",
+            "name",
+            "country",
+            "access"
+          ]
+        },
+        "UpdateSubAdminDto": {
+          "type": "object",
+          "properties": {
+            "password": {
+              "type": "string",
+              "description": "Enter password"
+            },
+            "name": {
+              "type": "string",
+              "description": "Enter name"
+            },
+            "country": {
+              "type": "string",
+              "description": "Enter Country"
+            },
+            "access": {
+              "description": "Menu List",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "string",
+              "description": "Enter user id"
+            }
+          },
+          "required": [
+            "password",
+            "name",
+            "country",
+            "access",
+            "id"
+          ]
+        },
+        "generate2faDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "description": "Enter Token"
+            },
+            "type": {
+              "type": "string",
+              "description": "Action type is required"
+            }
+          },
+          "required": [
+            "token",
+            "type"
+          ]
+        },
+        "changePasswordDto": {
+          "type": "object",
+          "properties": {
+            "oldPassword": {
+              "type": "string",
+              "description": "Enter current password"
+            },
+            "newPassword": {
+              "type": "string",
+              "description": "Enter current password"
+            }
+          },
+          "required": [
+            "oldPassword",
+            "newPassword"
+          ]
+        },
+        "sendInviteEmailDto": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "description": "Enter email",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "email"
+          ]
+        },
+        "updateKycUserInfoDto": {
+          "type": "object",
+          "properties": {
+            "dob": {
+              "type": "string",
+              "description": "Enter DOB"
+            },
+            "nickName": {
+              "type": "string",
+              "description": "Enter nickname"
+            },
+            "firstName": {
+              "type": "string",
+              "description": "Enter firstname"
+            },
+            "gender": {
+              "type": "string",
+              "description": "Enter gender",
+              "enum": [
+                "0",
+                "1"
+              ]
+            },
+            "zip": {
+              "type": "string",
+              "description": "Enter zip"
+            },
+            "city": {
+              "type": "string",
+              "description": "Enter city"
+            },
+            "street": {
+              "type": "string",
+              "description": "Enter street"
+            },
+            "taxNo": {
+              "type": "string",
+              "description": "Enter tax no"
+            },
+            "state": {
+              "type": "string",
+              "description": "Enter state"
+            },
+            "mobileNo": {
+              "type": "string",
+              "description": "Enter mobileno"
+            },
+            "countryCode": {
+              "type": "string",
+              "description": "Enter Country code"
+            }
+          },
+          "required": [
+            "dob",
+            "nickName",
+            "firstName",
+            "gender",
+            "city",
+            "taxNo",
+            "state",
+            "mobileNo",
+            "countryCode"
+          ]
+        },
+        "updateKycMobileDto": {
+          "type": "object",
+          "properties": {
+            "mobileNo": {
+              "type": "string",
+              "description": "Enter mobile no"
+            },
+            "phoneCode": {
+              "type": "string",
+              "description": "Enter phone_code"
+            },
+            "otp": {
+              "type": "string",
+              "description": "Enter otp"
+            }
+          },
+          "required": [
+            "mobileNo",
+            "phoneCode",
+            "otp"
+          ]
+        },
+        "updateKycVerifyDto": {
+          "type": "object",
+          "properties": {
+            "documentNo": {
+              "type": "string",
+              "description": "Enter document no"
+            },
+            "documentExpiryDate": {
+              "type": "string",
+              "description": "Enter document expiry date"
+            },
+            "documentId": {
+              "type": "string",
+              "description": "Enter document id"
+            },
+            "selfieId": {
+              "type": "string",
+              "description": "Enter selfie id"
+            },
+            "financialDocId": {
+              "type": "string",
+              "description": "Enter financial doc id"
+            },
+            "letterFromUserId": {
+              "type": "string",
+              "description": "Enter letter from user id"
+            }
+          },
+          "required": [
+            "documentNo",
+            "documentExpiryDate",
+            "documentId",
+            "selfieId",
+            "financialDocId",
+            "letterFromUserId"
+          ]
+        },
+        "enableDisable2faDto": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "enable": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "token",
+            "enable"
+          ]
+        },
+        "adminChangePasswordDto": {
+          "type": "object",
+          "properties": {
+            "oldPassword": {
+              "type": "string",
+              "description": "Enter current password"
+            },
+            "newPassword": {
+              "type": "string",
+              "description": "Enter new password"
+            }
+          },
+          "required": [
+            "oldPassword",
+            "newPassword"
+          ]
+        },
+        "CreateAdminAnnouncementDto": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Enter id"
+            },
+            "title": {
+              "type": "string",
+              "description": "Enter title"
+            },
+            "description": {
+              "type": "string",
+              "description": "Enter Description"
+            },
+            "isActive": {
+              "type": "string",
+              "description": "Select isActive"
+            },
+            "infoType": {
+              "type": "string",
+              "description": "Select infoType"
+            }
+          },
+          "required": [
+            "title",
+            "description"
+          ]
+        }
+      }
+    }
+  }]

@@ -1,0 +1,53 @@
+[
+  {
+    "name": "JSONPlaceholder - Get Posts",
+    "method": "GET",
+    "endpoint": "https://jsonplaceholder.typicode.com/posts/1",
+    "headers": {},
+    "expectedStatusCode": 200,
+    "expectedResponseKeys": ["userId", "id", "title", "body"]
+  },
+  {
+    "name": "JSONPlaceholder - Get Users",
+    "method": "GET",
+    "endpoint": "https://jsonplaceholder.typicode.com/users/1",
+    "expectedStatusCode": 200,
+    "expectedResponseKeys": ["id", "name", "email", "address"]
+  },
+  {
+    "name": "JSONPlaceholder - Create Post",
+    "method": "POST",
+    "endpoint": "https://jsonplaceholder.typicode.com/posts",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "title": "QA Test Post",
+      "body": "Created by API testing tool",
+      "userId": 1
+    },
+    "expectedStatusCode": 201,
+    "expectedResponseKeys": ["id", "title", "body", "userId"]
+  },
+  {
+    "name": "JSONPlaceholder - Update Post",
+    "method": "PUT",
+    "endpoint": "https://jsonplaceholder.typicode.com/posts/1",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": 1,
+      "title": "Updated title",
+      "body": "Updated body",
+      "userId": 1
+    },
+    "expectedStatusCode": 200
+  },
+  {
+    "name": "JSONPlaceholder - Delete Post",
+    "method": "DELETE",
+    "endpoint": "https://jsonplaceholder.typicode.com/posts/1",
+    "expectedStatusCode": 200
+  }
+]
