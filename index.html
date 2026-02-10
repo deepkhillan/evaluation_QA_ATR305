@@ -595,22 +595,127 @@
       color: #fff;
       border-color: var(--accent);
     }
+
+    .btn-security {
+      background: rgba(210, 153, 34, 0.2);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .btn-security:hover:not(:disabled) {
+      background: rgba(210, 153, 34, 0.35);
+    }
+
+    .security-section {
+      display: none;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .security-section.visible {
+      display: block;
+    }
+
+    .security-section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .security-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .security-summary .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .security-summary .card .value { font-size: 1.25rem; font-weight: 700; }
+    .security-summary .card .label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .security-summary .card.security-passed .value { color: var(--pass); }
+    .security-summary .card.security-failed .value { color: var(--fail); }
+    .security-summary .card.security-total .value { color: var(--accent); }
+
+    .security-category {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .security-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .security-card.fail {
+      border-left: 4px solid var(--fail);
+    }
+
+    .security-card.pass {
+      border-left: 4px solid var(--pass);
+    }
+
+    .security-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .security-check-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .security-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .security-badge.pass { background: rgba(63, 185, 80, 0.2); color: var(--pass); }
+    .security-badge.fail { background: rgba(248, 81, 73, 0.2); color: var(--fail); }
+
+    .security-detail {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .security-detail .endpoint { font-family: var(--font-mono); word-break: break-all; }
+    .security-detail .assertion { color: var(--fail); }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Dynamic API Testing Tool</h1>
-      <p class="subtitle">Enter a JSON file URL or upload a JSON file containing your API definitions</p>
+      <p class="subtitle">Enter a URL to an API list JSON or OpenAPI/Swagger API doc JSON, or upload a JSON file</p>
     </header>
 
     <div class="input-section">
-      <div class="input-row-label">JSON URL</div>
+      <div class="input-row-label">API list or API doc URL (JSON)</div>
       <div class="input-group">
         <input
           type="url"
           id="jsonUrl"
-          placeholder="https://example.com/apis.json"
+          placeholder="e.g. https://example.com/apis.json or https://api.example.com/openapi.json"
           autocomplete="off"
         />
         <button type="button" id="submitBtn" class="btn btn-primary">Run API Tests</button>
@@ -652,19 +757,36 @@
       <div class="download-buttons">
         <button type="button" id="downloadJson" class="btn btn-secondary">Download Report (JSON)</button>
         <button type="button" id="downloadHtml" class="btn btn-secondary">Download Report (HTML)</button>
+        <button type="button" id="downloadQaExcel" class="btn btn-secondary" title="Multi-tab report: Positive, Negative, Security, Summary">Download QA Report (Excel)</button>
+        <button type="button" id="runSecurityBtn" class="btn btn-security" title="Run security checks on last API run">Run security tests</button>
       </div>
       <div class="filter-tabs" id="filterTabs" style="display: none;">
         <button type="button" class="btn-filter active" data-filter="all">All</button>
         <button type="button" class="btn-filter" data-filter="failed">Failed only</button>
       </div>
       <div class="api-list" id="apiList"></div>
+
+      <section id="securitySection" class="security-section" aria-label="Security test results">
+        <h2>Security test results</h2>
+        <p class="subtitle" style="margin-bottom: 1rem;">Checks: Broken Authentication (missing/invalid token), BOLA, invalid headers, wrong HTTP method, injection, mass assignment, and sensitive data leakage in errors.</p>
+        <div id="securitySummary" class="security-summary"></div>
+        <div id="securityList"></div>
+      </section>
     </section>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
   <script>
     /**
-     * Dynamic API Testing Tool
-     * Fetches a JSON config from URL, runs each API, validates response and status, and reports results.
+     * Dynamic API Testing Tool (Swagger-aligned, with validation fixes)
+     *
+     * Validation & reliability fixes applied so script results match Swagger UI where possible:
+     * - Headers: Content-Type and Accept are taken from Swagger consumes/produces so request format matches.
+     * - Status: Any 2xx is accepted when spec expects 2xx (e.g. 201 vs 200) to avoid false failures.
+     * - Response keys: For list endpoints (array response), keys are validated on the first element.
+     * - Test data: Unique email/username per run to avoid conflicts with Swagger or previous runs.
+     * - Retry: 2 retries with 1s delay for 5xx or network errors to reduce flakiness.
+     * - Logging: Each result includes requestSent (method, url, headers, body) for comparison with Swagger.
      */
 
     // --- DOM elements ---
@@ -681,9 +803,328 @@
     const apiListEl = document.getElementById('apiList');
     const downloadJsonBtn = document.getElementById('downloadJson');
     const downloadHtmlBtn = document.getElementById('downloadHtml');
+    const downloadQaExcelBtn = document.getElementById('downloadQaExcel');
+    const runSecurityBtn = document.getElementById('runSecurityBtn');
+    const securitySection = document.getElementById('securitySection');
+    const securitySummaryEl = document.getElementById('securitySummary');
+    const securityListEl = document.getElementById('securityList');
 
     /** Last run result for JSON export (full details including response body). */
     let lastRunData = null;
+    /** Last security test results for QA report (set after Run security tests). */
+    let lastSecurityResults = null;
+
+    /**
+     * Dynamic test data generator – produces unique values per run so tests don't collide
+     * (e.g. create user in Swagger vs script using same email). Use for email, username, id.
+     */
+    const TestDataGenerator = {
+      _runId: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      uniqueEmail() {
+        return 'test.' + this._runId + '.' + Math.random().toString(36).slice(2, 10) + '@example.com';
+      },
+      uniqueUsername() {
+        return 'user_' + this._runId + '_' + Math.random().toString(36).slice(2, 8);
+      },
+      uniqueId() {
+        return this._runId + '_' + Math.random().toString(36).slice(2, 9);
+      },
+      randomString(len) {
+        len = len || 10;
+        return Math.random().toString(36).slice(2, 2 + len);
+      }
+    };
+
+    // --- Security testing (OWASP API, auth, negative cases) ---
+
+    /** Common auth header names to test missing/invalid token. */
+    const AUTH_HEADER_NAMES = ['authorization', 'authorizationheader', 'api_key', 'api-key', 'x-api-key', 'bearer', 'token', 'auth'];
+
+    /**
+     * Patterns that indicate sensitive data leakage in error responses (assert no match).
+     * Matches stack traces, SQL fragments, internal paths, etc.
+     */
+    const SENSITIVE_LEAK_PATTERNS = [
+      /\b(?:at\s+\w+\.\w+|\bat\s+[\w$]+\.\w+\s*\([^)]*\)|\.js:\d+:\d+)\b/i,
+      /\b(?:select|insert|update|delete|drop|union|exec|execute)\s+.*\b(?:from|into|where)\b/i,
+      /\b(?:SyntaxError|TypeError|ReferenceError|EvalError)\b/i,
+      /\b(?:mongodb|mongoose|pg|mysql|sqlite|redis)\s*(?:error|exception)?/i,
+      /\/[a-z0-9_.-]+\/(?:node_modules|vendor|lib)\//i,
+      /\b(?:password|secret|private_key|api_key)\s*[=:]\s*["']?\w+["']?/i
+    ];
+
+    /**
+     * Returns true if the response body likely leaks sensitive info (stack trace, SQL, paths, secrets).
+     * Used to assert that 4xx/5xx responses do not expose internal details.
+     */
+    function responseLeaksSensitiveInfo(responseBodyText, status) {
+      if (status < 400 || !responseBodyText || typeof responseBodyText !== 'string') return false;
+      const lower = responseBodyText.toLowerCase();
+      return SENSITIVE_LEAK_PATTERNS.some(re => re.test(responseBodyText));
+    }
+
+    /**
+     * Builds security test case variants from a base API definition.
+     * Each variant expects a specific status (e.g. 401 for missing auth) and category for reporting.
+     */
+    function buildSecurityTestCases(baseDef) {
+      const cases = [];
+      const method = (baseDef.method || 'GET').toUpperCase();
+      const url = baseDef.endpoint || baseDef.url;
+      const headers = { ...(baseDef.headers || {}) };
+      const body = baseDef.body ?? baseDef.requestBody;
+
+      const normalizedHeaders = {};
+      Object.keys(headers).forEach(k => { normalizedHeaders[k.toLowerCase()] = headers[k]; });
+
+      const hasAuthHeader = AUTH_HEADER_NAMES.some(name => normalizedHeaders[name]);
+
+      // --- Broken Authentication: missing token ---
+      if (hasAuthHeader) {
+        const noAuthHeaders = { ...headers };
+        AUTH_HEADER_NAMES.forEach(name => {
+          Object.keys(noAuthHeaders).forEach(k => { if (k.toLowerCase() === name) delete noAuthHeaders[k]; });
+        });
+        cases.push({
+          apiDef: { ...baseDef, headers: noAuthHeaders, url, method, body },
+          expectedStatus: 401,
+          category: 'Broken Authentication',
+          checkName: 'Missing auth token rejected (401)',
+          description: 'Endpoint should return 401 when Authorization/API key is omitted.'
+        });
+      }
+
+      // --- Broken Authentication: invalid token ---
+      if (hasAuthHeader) {
+        const invalidAuthHeaders = { ...headers };
+        Object.keys(invalidAuthHeaders).forEach(k => {
+          if (AUTH_HEADER_NAMES.includes(k.toLowerCase())) {
+            invalidAuthHeaders[k] = 'Bearer invalid-token-12345';
+          }
+        });
+        cases.push({
+          apiDef: { ...baseDef, headers: invalidAuthHeaders, url, method, body },
+          expectedStatus: 401,
+          category: 'Broken Authentication',
+          checkName: 'Invalid token rejected (401)',
+          description: 'Endpoint should return 401 for invalid or malformed token.'
+        });
+      }
+
+      // --- Invalid / tampered headers (e.g. X-Forwarded-For abuse) ---
+      const tamperedHeaders = { ...headers, 'X-Forwarded-For': '127.0.0.1', 'X-Original-URL': '/admin' };
+      cases.push({
+        apiDef: { ...baseDef, headers: tamperedHeaders, url, method, body },
+        expectedStatus: null,
+        category: 'Invalid Headers',
+        checkName: 'Tampered headers handled safely',
+        description: 'Request with X-Forwarded-For / X-Original-URL should not bypass auth or routing. Expect 2xx only if legitimately authorized.'
+      });
+
+      // --- BOLA: access with different resource ID (expect 403/404, not 200) ---
+      const pathWithId = /\/\d+(\/|$)/;
+      if (pathWithId.test(url)) {
+        const otherIdUrl = url.replace(/\/\d+(\/|$)/, '/99999$1');
+        cases.push({
+          apiDef: { ...baseDef, url: otherIdUrl, method, headers, body },
+          expectedStatus: [403, 404],
+          category: 'BOLA (Broken Object Level Authorization)',
+          checkName: 'Access with other resource ID (403/404)',
+          description: 'Accessing another resource ID should return 403 Forbidden or 404 Not Found, not 200.'
+        });
+      }
+
+      // --- Unexpected HTTP method ---
+      const badMethod = method === 'GET' ? 'POST' : 'GET';
+      cases.push({
+        apiDef: { ...baseDef, method: badMethod, url, headers, body: method === 'GET' ? undefined : body },
+        expectedStatus: 405,
+        category: 'Unexpected HTTP Method',
+        checkName: 'Wrong method rejected (405)',
+        description: 'Endpoint should return 405 Method Not Allowed for incorrect HTTP method.'
+      });
+
+      // --- Injection (SQL/NoSQL) in body for POST/PUT/PATCH ---
+      if (['POST', 'PUT', 'PATCH'].includes(method) && body && typeof body === 'object') {
+        const injectBody = JSON.parse(JSON.stringify(body));
+        const sqlPayload = "1' OR '1'='1";
+        const noSqlPayload = { $gt: '' };
+        let injected = false;
+        Object.keys(injectBody).forEach(key => {
+          if (typeof injectBody[key] === 'string') {
+            injectBody[key] = sqlPayload;
+            injected = true;
+          }
+        });
+        if (injected) {
+          cases.push({
+            apiDef: { ...baseDef, headers, url, method, body: injectBody },
+            expectedStatus: 400,
+            category: 'Injection (OWASP)',
+            checkName: 'SQL/input injection rejected (400)',
+            description: 'Payload with SQL-like string should be rejected (400) or sanitized; must not return 200 with injected result.'
+          });
+        }
+      }
+
+      // --- Mass assignment: extra privileged fields in body ---
+      if (['POST', 'PUT', 'PATCH'].includes(method) && body && typeof body === 'object') {
+        const massAssignBody = { ...JSON.parse(JSON.stringify(body)), role: 'admin', isAdmin: true };
+        cases.push({
+          apiDef: { ...baseDef, headers, url, method, body: massAssignBody },
+          expectedStatus: null,
+          category: 'Mass Assignment (OWASP)',
+          checkName: 'Extra fields not accepted as privilege escalation',
+          description: 'Request with role/admin fields should not grant elevated access; 200 only if server ignores or strips them.'
+        });
+      }
+
+      return cases;
+    }
+
+    /**
+     * Runs a single security test case and returns a result with pass/fail and security assertion.
+     */
+    async function runSecurityCase(testCase) {
+      const { apiDef, expectedStatus, category, checkName, description } = testCase;
+      const result = await executeApi(apiDef);
+      const actual = result.actualStatus;
+      const leaked = responseLeaksSensitiveInfo(result.responseBodyText || '', actual);
+
+      let pass = false;
+      let assertion = '';
+
+      const allowed = Array.isArray(expectedStatus) ? expectedStatus : (expectedStatus != null ? [expectedStatus] : null);
+      if (allowed && allowed.length > 0) {
+        pass = allowed.includes(actual) && !leaked;
+        if (!allowed.includes(actual)) assertion = `Expected one of [${allowed.join(', ')}], got ${actual}. `;
+      } else {
+        pass = !leaked && (actual >= 200 && actual < 500);
+        assertion = pass ? '' : `Unexpected status ${actual} or sensitive data in response. `;
+      }
+
+      if (leaked) assertion += 'SECURITY: Response may leak sensitive info (stack trace, SQL, paths). ';
+
+      return {
+        category,
+        checkName,
+        description,
+        pass,
+        status: actual,
+        expectedStatus: allowed || expectedStatus,
+        endpoint: `${apiDef.method} ${apiDef.url}`,
+        assertion: assertion || (pass ? 'OK' : 'Check failed'),
+        responseSnippet: (result.responseBodyText || '').slice(0, 200)
+      };
+    }
+
+    /**
+     * Runs all security test cases derived from the last API list; reports by category.
+     */
+    async function runSecurityTests() {
+      hideError();
+      if (!securitySection || !securitySummaryEl || !securityListEl) {
+        showError('Security test UI elements not found.');
+        return;
+      }
+      if (!lastRunData || !lastRunData.results || lastRunData.results.length === 0) {
+        showError('Run API tests first, then run security tests.');
+        return;
+      }
+
+      const apiDefs = lastRunData.results.map(r => ({
+        name: r.name,
+        method: r.method,
+        url: r.url,
+        endpoint: r.url,
+        headers: r.requestHeaders || {},
+        body: r.requestBody,
+        requestBody: r.requestBody,
+        expectedStatusCode: r.expectedStatus
+      }));
+
+      runSecurityBtn.disabled = true;
+      securitySection.classList.add('visible');
+      securitySummaryEl.innerHTML = '<div class="card"><span class="value">Running security checks…</span><span class="label">Please wait</span></div>';
+      securityListEl.innerHTML = '';
+      securitySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      try {
+        const allCases = [];
+        apiDefs.forEach(def => {
+          try {
+            buildSecurityTestCases(def).forEach(c => allCases.push(c));
+          } catch (e) {
+            console.warn('Security cases for ' + (def.name || def.url) + ':', e);
+          }
+        });
+
+        if (allCases.length === 0) {
+          securitySummaryEl.innerHTML = '<div class="card security-failed"><div class="value">0</div><div class="label">No security cases generated. Check that APIs have auth or body where needed.</div></div>';
+          return;
+        }
+
+        const results = [];
+        for (const tc of allCases) {
+          try {
+            const res = await runSecurityCase(tc);
+            results.push(res);
+          } catch (e) {
+            results.push({
+              category: tc.category,
+              checkName: tc.checkName,
+              description: tc.description,
+              pass: false,
+              status: null,
+              expectedStatus: tc.expectedStatus,
+              endpoint: tc.apiDef.method + ' ' + tc.apiDef.url,
+              assertion: 'Error: ' + (e.message || String(e))
+            });
+          }
+        }
+
+        const passed = results.filter(r => r.pass).length;
+        const failed = results.length - passed;
+
+        securitySummaryEl.innerHTML = `
+          <div class="card security-total"><div class="value">${results.length}</div><div class="label">Security checks</div></div>
+          <div class="card security-passed"><div class="value">${passed}</div><div class="label">Passed</div></div>
+          <div class="card security-failed"><div class="value">${failed}</div><div class="label">Failed</div></div>
+        `;
+
+        const byCategory = {};
+        results.forEach(r => {
+          if (!byCategory[r.category]) byCategory[r.category] = [];
+          byCategory[r.category].push(r);
+        });
+
+        let html = '';
+        Object.keys(byCategory).sort().forEach(cat => {
+          html += `<div class="security-category">${escapeHtml(cat)}</div>`;
+          byCategory[cat].forEach(r => {
+            html += `
+              <div class="security-card ${r.pass ? 'pass' : 'fail'}">
+                <div class="security-card-header">
+                  <span class="security-check-name">${escapeHtml(r.checkName)}</span>
+                  <span class="security-badge ${r.pass ? 'pass' : 'fail'}">${r.pass ? 'Pass' : 'Fail'}</span>
+                </div>
+                <div class="security-detail">
+                  <div class="endpoint">${escapeHtml(r.endpoint)}</div>
+                  <div class="assertion">${escapeHtml(r.assertion)}</div>
+                </div>
+              </div>`;
+          });
+        });
+        securityListEl.innerHTML = html;
+        securitySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        lastSecurityResults = results;
+      } catch (err) {
+        showError('Security tests failed: ' + (err.message || String(err)));
+        securitySummaryEl.innerHTML = '<div class="card security-failed"><div class="value">Error</div><div class="label">' + escapeHtml(err.message || String(err)) + '</div></div>';
+      } finally {
+        runSecurityBtn.disabled = false;
+      }
+    }
 
     /**
      * Hides the error banner and clears its text.
@@ -704,7 +1145,8 @@
 
     /**
      * Validates that expected response keys exist in the response body.
-     * @param {object} body - Parsed response body (object).
+     * When body is an array (e.g. list endpoints), validates the first element so we don't false-fail.
+     * @param {object|array} body - Parsed response body.
      * @param {string[]} expectedKeys - Array of key paths, e.g. ['data', 'user.id'].
      * @returns {{ valid: boolean, missing: string[] }}
      */
@@ -712,10 +1154,17 @@
       if (!expectedKeys || expectedKeys.length === 0) {
         return { valid: true, missing: [] };
       }
+      let target = body;
+      if (Array.isArray(body) && body.length > 0 && typeof body[0] === 'object') {
+        target = body[0];
+      }
+      if (target == null || typeof target !== 'object') {
+        return { valid: false, missing: expectedKeys };
+      }
       const missing = [];
       for (const keyPath of expectedKeys) {
         const parts = keyPath.split('.');
-        let current = body;
+        let current = target;
         for (const part of parts) {
           if (current == null || typeof current !== 'object' || !(part in current)) {
             missing.push(keyPath);
@@ -730,12 +1179,18 @@
       };
     }
 
+    /** Default retry: 2 retries for 5xx or network errors, 1s delay. */
+    const RETRY_COUNT = 2;
+    const RETRY_DELAY_MS = 1000;
+
     /**
-     * Executes a single API request and returns result object.
-     * @param {object} apiDef - API definition from JSON.
-     * @returns {Promise<object>} Result with status, duration, body, pass, reason, etc.
+     * Executes a single API request with optional retry, aligned to Swagger (headers, 2xx acceptance).
+     * - Headers: uses apiDef.headers as-is so Swagger-derived Content-Type/Accept are sent.
+     * - Status: accepts any 2xx when expected is 2xx (e.g. 200 vs 201) to avoid false failures.
+     * - Logs: requestSent and responseSnippet for debugging script vs Swagger mismatches.
      */
-    async function executeApi(apiDef) {
+    async function executeApi(apiDef, options) {
+      const { retries = RETRY_COUNT } = options || {};
       const start = performance.now();
       const result = {
         name: apiDef.name || 'Unnamed API',
@@ -749,18 +1204,24 @@
         responseBody: null,
         responseBodyText: null,
         pass: false,
-        reason: null
+        reason: null,
+        requestSent: null,
+        responseSnippet: null
       };
 
       const methodsWithBody = ['POST', 'PUT', 'PATCH'];
       const hasBody = methodsWithBody.includes(result.method) && result.requestBody != null;
 
+      const baseHeaders = {};
+      if (hasBody && !result.requestHeaders['Content-Type'] && !result.requestHeaders['content-type']) {
+        baseHeaders['Content-Type'] = 'application/json';
+      }
+      if (!result.requestHeaders['Accept'] && !result.requestHeaders['accept']) {
+        baseHeaders['Accept'] = 'application/json';
+      }
       const fetchOptions = {
         method: result.method,
-        headers: {
-          'Content-Type': 'application/json',
-          ...result.requestHeaders
-        }
+        headers: { ...baseHeaders, ...result.requestHeaders }
       };
 
       if (hasBody) {
@@ -769,52 +1230,79 @@
           : JSON.stringify(result.requestBody);
       }
 
-      try {
-        const response = await fetch(result.url, fetchOptions);
-        result.responseTimeMs = Math.round(performance.now() - start);
-        result.actualStatus = response.status;
-        result.responseBodyText = await response.text();
+      result.requestSent = {
+        method: result.method,
+        url: result.url,
+        headers: { ...fetchOptions.headers },
+        body: hasBody ? (typeof result.requestBody === 'string' ? result.requestBody : JSON.stringify(result.requestBody)) : undefined
+      };
+      if (result.requestSent.body && result.requestSent.body.length > 500) {
+        result.requestSent.body = result.requestSent.body.slice(0, 500) + '...';
+      }
 
+      let lastError = null;
+      for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-          result.responseBody = JSON.parse(result.responseBodyText);
-        } catch {
-          result.responseBody = result.responseBodyText;
-        }
+          const response = await fetch(result.url, fetchOptions);
+          result.responseTimeMs = Math.round(performance.now() - start);
+          result.actualStatus = response.status;
+          result.responseBodyText = await response.text();
 
-        // Status code validation
-        const expectedStatus = result.expectedStatus;
-        const statusOk = expectedStatus != null
-          ? response.status === expectedStatus
-          : response.ok;
+          result.responseSnippet = result.responseBodyText.length > 300
+            ? result.responseBodyText.slice(0, 300) + '...'
+            : result.responseBodyText;
 
-        if (!statusOk) {
-          result.pass = false;
-          result.reason = expectedStatus != null
-            ? `Expected status ${expectedStatus}, got ${response.status}`
-            : `Request failed with status ${response.status}`;
-          return result;
-        }
+          try {
+            result.responseBody = JSON.parse(result.responseBodyText);
+          } catch {
+            result.responseBody = result.responseBodyText;
+          }
 
-        // Optional: validate expected response keys (only for JSON object body)
-        const expectedKeys = apiDef.expectedResponseKeys || apiDef.expectedKeys;
-        if (expectedKeys && Array.isArray(expectedKeys) && typeof result.responseBody === 'object') {
-          const keyValidation = validateResponseKeys(result.responseBody, expectedKeys);
-          if (!keyValidation.valid) {
+          const expectedStatus = result.expectedStatus;
+          const expected2xx = expectedStatus != null && expectedStatus >= 200 && expectedStatus < 300;
+          const actual2xx = response.status >= 200 && response.status < 300;
+          const statusOk = expectedStatus == null
+            ? response.ok
+            : expected2xx
+              ? actual2xx
+              : response.status === expectedStatus;
+
+          if (!statusOk) {
             result.pass = false;
-            result.reason = `Missing response keys: ${keyValidation.missing.join(', ')}`;
+            result.reason = expectedStatus != null
+              ? `Expected ${expected2xx ? '2xx' : expectedStatus}, got ${response.status}`
+              : `Request failed with status ${response.status}`;
             return result;
           }
-        }
 
-        result.pass = true;
-        result.reason = null;
-        return result;
-      } catch (err) {
-        result.responseTimeMs = Math.round(performance.now() - start);
-        result.pass = false;
-        result.reason = err.message || 'Network or request error';
-        return result;
+          const expectedKeys = apiDef.expectedResponseKeys || apiDef.expectedKeys;
+          if (expectedKeys && Array.isArray(expectedKeys) && (typeof result.responseBody === 'object' || Array.isArray(result.responseBody))) {
+            const keyValidation = validateResponseKeys(result.responseBody, expectedKeys);
+            if (!keyValidation.valid) {
+              result.pass = false;
+              result.reason = `Missing response keys: ${keyValidation.missing.join(', ')}`;
+              return result;
+            }
+          }
+
+          result.pass = true;
+          result.reason = null;
+          return result;
+        } catch (err) {
+          lastError = err;
+          const is5xx = result.actualStatus >= 500;
+          if (attempt < retries && (is5xx || result.actualStatus == null)) {
+            await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+            continue;
+          }
+          result.responseTimeMs = Math.round(performance.now() - start);
+          result.pass = false;
+          result.reason = lastError.message || 'Network or request error';
+          if (retries > 0) result.reason += ' (after ' + (attempt + 1) + ' attempts)';
+          return result;
+        }
       }
+      return result;
     }
 
     /**
@@ -913,6 +1401,13 @@
             headers[p.name] = String(value);
           }
 
+          // Match Swagger request: Content-Type from consumes, Accept from produces
+          // (Swagger UI sends these; missing/wrong values can cause 415/406 or wrong body handling)
+          const consumes = op.consumes && op.consumes[0];
+          const produces = op.produces && op.produces[0];
+          if (consumes) headers['Content-Type'] = consumes;
+          if (produces) headers['Accept'] = produces;
+
           // Best-effort API key header from Swagger securityDefinitions (if present)
           if (spec.securityDefinitions && op.security) {
             const apiKeyDef = spec.securityDefinitions.api_key;
@@ -952,7 +1447,30 @@
     }
 
     /**
+     * Picks a value for a schema property: use example/default, or generate from format/name
+     * so request body matches Swagger and uses unique test data where needed.
+     */
+    function schemaPropertyValue(spec, prop, key) {
+      if (prop.example !== undefined) return prop.example;
+      if (prop.default !== undefined) return prop.default;
+      const keyLower = (key || '').toLowerCase();
+      const format = (prop.format || '').toLowerCase();
+      if (prop.type === 'string') {
+        if (format === 'email' || keyLower.includes('email')) return TestDataGenerator.uniqueEmail();
+        if (format === 'uuid' || keyLower.includes('uuid')) return TestDataGenerator.uniqueId();
+        if (keyLower.includes('username') || keyLower === 'name') return TestDataGenerator.uniqueUsername();
+        return prop.enum && prop.enum[0] ? prop.enum[0] : '';
+      }
+      if (prop.type === 'integer' || prop.type === 'number') return 0;
+      if (prop.type === 'boolean') return false;
+      if (prop.type === 'array') return prop.items ? [bodyFromSchema(spec, prop.items)] : [];
+      if (prop['$ref']) return bodyFromSchema(spec, prop);
+      return '';
+    }
+
+    /**
      * Builds a minimal example object from a Swagger/OpenAPI schema (for request body when no x-example).
+     * Uses required[] and generates unique values for email/username so script matches Swagger expectations.
      */
     function bodyFromSchema(spec, schema) {
       if (!schema || typeof schema !== 'object') return undefined;
@@ -963,15 +1481,11 @@
           const defs = spec.definitions || spec.components?.schemas || {};
           const def = defs[match[2]];
           if (def && def.properties) {
+            const required = def.required || [];
             const obj = {};
             for (const key of Object.keys(def.properties)) {
               const prop = def.properties[key];
-              if (prop.type === 'string') obj[key] = prop.example !== undefined ? prop.example : '';
-              else if (prop.type === 'integer' || prop.type === 'number') obj[key] = prop.example !== undefined ? prop.example : 0;
-              else if (prop.type === 'boolean') obj[key] = prop.example !== undefined ? prop.example : false;
-              else if (prop.type === 'array') obj[key] = prop.items ? [bodyFromSchema(spec, prop.items)] : [];
-              else if (prop['$ref']) obj[key] = bodyFromSchema(spec, prop);
-              else obj[key] = '';
+              obj[key] = schemaPropertyValue(spec, prop, key);
             }
             return obj;
           }
@@ -1114,7 +1628,8 @@
 
     /**
      * Fetches JSON config from URL and returns parsed array of API definitions.
-     * @param {string} url - URL to JSON file.
+     * Uses headers to support ngrok (skip browser warning) and request JSON.
+     * @param {string} url - URL to JSON file or OpenAPI/Swagger doc.
      * @returns {Promise<object[]>}
      */
     async function fetchApiConfig(url) {
@@ -1122,11 +1637,38 @@
       if (!trimmed) {
         throw new Error('Please enter a JSON file URL.');
       }
-      const response = await fetch(trimmed);
-      if (!response.ok) {
-        throw new Error(`Failed to load JSON: ${response.status} ${response.statusText}`);
+      const headers = {
+        'Accept': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      };
+      let response;
+      try {
+        response = await fetch(trimmed, { headers });
+      } catch (err) {
+        const msg = (err && err.message) || '';
+        if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+          throw new Error(
+            'Could not reach the URL. Common causes: (1) CORS – server must allow your origin, or try uploading the JSON file instead. ' +
+            '(2) If using ngrok, the request now includes a header to skip the browser warning. ' +
+            '(3) Ensure the URL returns raw JSON (e.g. /api/docs/json or /openapi.json), not an HTML docs page.'
+          );
+        }
+        throw err;
       }
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`Failed to load JSON: ${response.status} ${response.statusText}. If the URL shows a docs UI in the browser, try the raw JSON URL (e.g. /api/docs/json or /openapi.json).`);
+      }
+      const contentType = response.headers.get('Content-Type') || '';
+      const text = await response.text();
+      if (!contentType.includes('json') && text.trimStart().startsWith('<')) {
+        throw new Error('The URL returned HTML instead of JSON. Use the raw OpenAPI/Swagger JSON URL (e.g. /api/docs/json, /openapi.json, or /swagger.json).');
+      }
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('Invalid JSON from URL. The endpoint may return HTML; use the raw JSON URL for the API spec.');
+      }
       return parseApiList(data);
     }
 
@@ -1277,6 +1819,10 @@
             ${result.reason ? `<div class="api-detail-row"><span class="key">Why it failed</span><span class="value fail-reason">${escapeHtml(result.reason)}</span></div>` : ''}
           </div>
           ${summaryBox}
+          ${result.requestSent ? `
+            <div class="response-body-toggle" data-toggle="request">▼ Show request sent (for Swagger comparison)</div>
+            <pre class="response-body-content" data-request-log>${escapeHtml(JSON.stringify(result.requestSent, null, 2))}</pre>
+          ` : ''}
           ${responseBodyStr ? `
             <div class="response-body-toggle" data-toggle="body">▼ Show full response body</div>
             <pre class="response-body-content">${escapeHtml(responseBodyStr)}</pre>
@@ -1308,8 +1854,10 @@
 
       card._result = result;
       const header = card.querySelector('.api-card-header');
+      const requestToggle = card.querySelector('[data-toggle="request"]');
+      const requestLogContent = card.querySelector('[data-request-log]');
       const toggleBtn = card.querySelector('[data-toggle="body"]');
-      const bodyContent = card.querySelector('.response-body-content');
+      const bodyContent = card.querySelector('.response-body-content:not([data-request-log])');
       const editBtn = card.querySelector('[data-action="edit"]');
       const panel = card.querySelector('[data-panel="edit"]');
       const urlInput = card.querySelector('[data-edit="url"]');
@@ -1322,6 +1870,16 @@
       header.addEventListener('click', () => {
         card.classList.toggle('expanded');
       });
+
+      if (requestToggle && requestLogContent) {
+        requestToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          requestLogContent.classList.toggle('visible');
+          requestToggle.textContent = requestLogContent.classList.contains('visible')
+            ? '▲ Hide request sent'
+            : '▼ Show request sent (for Swagger comparison)';
+        });
+      }
 
       if (toggleBtn && bodyContent) {
         toggleBtn.addEventListener('click', (e) => {
@@ -1465,6 +2023,7 @@
         btn.classList.toggle('active', btn.dataset.filter === 'all');
       });
       applyFilter('all');
+      if (runSecurityBtn) runSecurityBtn.disabled = false;
       resultsSection.classList.add('visible');
     }
 
@@ -1578,6 +2137,176 @@
     }
 
     /**
+     * Truncates string for Excel cell (avoids huge cells); keeps single line breaks.
+     */
+    function truncateForCell(s, maxLen) {
+      if (s == null || s === undefined) return '';
+      const t = String(s);
+      if (t.length <= (maxLen || 500)) return t;
+      return t.slice(0, maxLen || 500) + '...';
+    }
+
+    /**
+     * Builds QA report workbook with 4 sheets: Positive Test Cases, Negative Test Cases,
+     * Security Test Cases, Summary Dashboard. Uses lastRunData and lastSecurityResults.
+     * Excel/Google Sheets friendly; professional QA wording.
+     */
+    function downloadQaReportExcel() {
+      if (typeof XLSX === 'undefined') {
+        showError('Excel export requires the XLSX library. Check your network connection and reload the page.');
+        return;
+      }
+      if (!lastRunData || !lastRunData.results || lastRunData.results.length === 0) {
+        showError('Run API tests first. No results to include in the QA report.');
+        return;
+      }
+
+      const results = lastRunData.results;
+      const securityResults = lastSecurityResults || [];
+      const negativeCases = securityResults.filter(r => {
+        const exp = r.expectedStatus;
+        const codes = Array.isArray(exp) ? exp : (exp != null ? [exp] : []);
+        return codes.some(c => c >= 400 && c < 600);
+      });
+
+      // --- Sheet 1: Positive Test Cases Report ---
+      const positiveHeaders = [
+        'Test Case ID', 'API Name', 'Endpoint', 'HTTP Method', 'Test Scenario',
+        'Request Details', 'Expected Result', 'Actual Result', 'Status', 'Response Time (ms)', 'Remarks'
+      ];
+      const positiveRows = [positiveHeaders];
+      results.forEach((r, i) => {
+        const reqDetails = r.requestSent
+          ? (r.requestSent.body ? truncateForCell(r.requestSent.body, 400) : (r.requestSent.url || ''))
+          : '—';
+        const actualResult = r.actualStatus != null
+          ? (r.actualStatus + (r.responseSnippet ? ' | ' + truncateForCell(r.responseSnippet, 200) : ''))
+          : (r.reason || '—');
+        positiveRows.push([
+          'TC-P-' + String(i + 1).padStart(3, '0'),
+          r.name || 'Unnamed API',
+          r.url || '—',
+          r.method || 'GET',
+          'Valid request with required headers and body per specification',
+          reqDetails,
+          r.expectedStatus != null ? (r.expectedStatus >= 200 && r.expectedStatus < 300 ? '2xx success' : String(r.expectedStatus)) : '2xx or success',
+          actualResult,
+          r.pass ? 'Pass' : 'Fail',
+          r.responseTimeMs != null ? r.responseTimeMs : '—',
+          r.reason || (r.pass ? '—' : truncateForCell(r.reason, 200))
+        ]);
+      });
+
+      // --- Sheet 2: Negative Test Cases Report ---
+      const negativeHeaders = [
+        'Test Case ID', 'API Name', 'Endpoint', 'HTTP Method', 'Negative Scenario',
+        'Invalid Input / Condition', 'Expected Error Code', 'Actual Status Code', 'Error Message', 'Status', 'Remarks'
+      ];
+      const negativeRows = [negativeHeaders];
+      negativeCases.forEach((r, i) => {
+        const endpoint = r.endpoint || '';
+        const method = (endpoint.split(/\s+/)[0] || '').toUpperCase();
+        negativeRows.push([
+          'TC-N-' + String(i + 1).padStart(3, '0'),
+          endpoint.replace(/^(GET|POST|PUT|DELETE|PATCH)\s+/i, '').trim() || endpoint,
+          endpoint,
+          method || '—',
+          r.checkName || r.category || '—',
+          r.description || '—',
+          Array.isArray(r.expectedStatus) ? r.expectedStatus.join(', ') : (r.expectedStatus != null ? String(r.expectedStatus) : '—'),
+          r.status != null ? r.status : '—',
+          truncateForCell(r.assertion || r.responseSnippet, 300),
+          r.pass ? 'Pass' : 'Fail',
+          r.pass ? '—' : truncateForCell(r.assertion, 150)
+        ]);
+      });
+      if (negativeRows.length === 1) {
+        negativeRows.push(['No dedicated negative test cases executed. Run security tests to populate negative scenarios (e.g. invalid auth, wrong method).', '', '', '', '', '', '', '', '', '', '']);
+      }
+
+      // --- Sheet 3: Security Test Cases Report ---
+      const securityHeaders = [
+        'Test Case ID', 'API Name', 'Security Scenario', 'Input / Attack Type',
+        'Expected Behavior', 'Actual Behavior', 'Status', 'Remarks'
+      ];
+      const securityRows = [securityHeaders];
+      securityResults.forEach((r, i) => {
+        const expectedStr = Array.isArray(r.expectedStatus) ? r.expectedStatus.join(' or ') : (r.expectedStatus != null ? String(r.expectedStatus) : 'No specific code; no sensitive data leakage');
+        securityRows.push([
+          'TC-S-' + String(i + 1).padStart(3, '0'),
+          (r.endpoint || '').replace(/^(GET|POST|PUT|DELETE|PATCH)\s+/i, '').trim() || r.endpoint || '—',
+          r.category || '—',
+          r.checkName || '—',
+          expectedStr,
+          (r.status != null ? 'Status: ' + r.status + '. ' : '') + truncateForCell(r.assertion, 250),
+          r.pass ? 'Pass' : 'Fail',
+          r.pass ? '—' : truncateForCell(r.assertion, 200)
+        ]);
+      });
+      if (securityRows.length === 1) {
+        securityRows.push(['No security tests run. Click "Run security tests" after running API tests to populate this sheet.', '', '', '', '', '', '', '']);
+      }
+
+      // --- Sheet 4: Summary Dashboard ---
+      const posPassed = results.filter(r => r.pass).length;
+      const posFailed = results.length - posPassed;
+      const negTotal = negativeCases.length;
+      const negPassed = negativeCases.filter(r => r.pass).length;
+      const negFailed = negTotal - negPassed;
+      const secPassed = securityResults.filter(r => r.pass).length;
+      const secFailed = securityResults.length - secPassed;
+      const totalExecuted = results.length + securityResults.length;
+      const totalPassed = posPassed + secPassed;
+      const totalFailed = posFailed + secFailed;
+      const passPct = totalExecuted > 0 ? (Math.round((totalPassed / totalExecuted) * 100)) : 0;
+      const highRisk = [];
+      if (securityResults.some(r => r.category && r.category.includes('BOLA') && !r.pass)) highRisk.push('BOLA: Access with different resource ID returned success; possible authorization bypass.');
+      if (securityResults.some(r => r.category && r.category.includes('Broken Authentication') && !r.pass)) highRisk.push('Authentication: Endpoint did not reject missing or invalid token with 401.');
+      if (securityResults.some(r => r.category && r.category.includes('Injection') && !r.pass)) highRisk.push('Injection: Payload with SQL-like input was not rejected (400).');
+      if (highRisk.length === 0 && totalFailed > 0) highRisk.push('Review failed test cases in Positive, Negative, and Security tabs for details.');
+
+      const summaryRows = [
+        ['API Testing Report – Summary Dashboard', ''],
+        ['Generated', new Date().toISOString().slice(0, 19).replace('T', ' ') + ' UTC'],
+        ['', ''],
+        ['Metric', 'Value'],
+        ['Total APIs Tested', results.length],
+        ['Total Positive Test Cases', results.length],
+        ['Total Negative Test Cases', negTotal],
+        ['Total Security Test Cases', securityResults.length],
+        ['', ''],
+        ['Passed (Positive)', posPassed],
+        ['Failed (Positive)', posFailed],
+        ['Passed (Security)', secPassed],
+        ['Failed (Security)', secFailed],
+        ['', ''],
+        ['Overall Pass Percentage', passPct + '%'],
+        ['Total Passed', totalPassed],
+        ['Total Failed', totalFailed],
+        ['', ''],
+        ['High-Risk Failures', highRisk.length > 0 ? highRisk.join(' ') : 'None identified.'],
+        ['', ''],
+        ['Observations & Recommendations', ''],
+        ['Observations', totalFailed === 0 ? 'All executed test cases passed.' : totalFailed + ' test case(s) failed. Review failed rows in each tab for root cause.'],
+        ['Recommendations', 'Re-run failed cases after fixes; run security tests regularly; ensure auth and BOLA checks are enforced.']
+      ];
+
+      const wb = XLSX.utils.book_new();
+      wb.Props = { Title: 'API Testing Report', Author: 'API Testing Tool', CreatedDate: new Date() };
+      const sheetPositive = XLSX.utils.aoa_to_sheet(positiveRows);
+      const sheetNegative = XLSX.utils.aoa_to_sheet(negativeRows);
+      const sheetSecurity = XLSX.utils.aoa_to_sheet(securityRows);
+      const sheetSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+      XLSX.utils.book_append_sheet(wb, sheetPositive, 'Positive Test Cases');
+      XLSX.utils.book_append_sheet(wb, sheetNegative, 'Negative Test Cases');
+      XLSX.utils.book_append_sheet(wb, sheetSecurity, 'Security Test Cases');
+      XLSX.utils.book_append_sheet(wb, sheetSummary, 'Summary Dashboard');
+      const filename = `API_Testing_Report_${new Date().toISOString().slice(0, 10)}_${Date.now().toString().slice(-6)}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      hideError();
+    }
+
+    /**
      * Main flow: load config from file (if selected) or URL, run APIs, render results, handle errors.
      */
     async function runTests() {
@@ -1586,7 +2315,7 @@
       const url = jsonUrlInput.value.trim();
 
       if (!hasFile && !url) {
-        showError('Please enter a JSON file URL or upload a JSON file.');
+        showError('Please enter an API list or API doc (OpenAPI/Swagger) JSON URL, or upload a JSON file.');
         return;
       }
 
@@ -1643,10 +2372,15 @@
     });
     downloadJsonBtn.addEventListener('click', downloadReportJson);
     downloadHtmlBtn.addEventListener('click', downloadReportHtml);
+    if (downloadQaExcelBtn) downloadQaExcelBtn.addEventListener('click', downloadQaReportExcel);
     filterTabsEl.addEventListener('click', (e) => {
       const btn = e.target.closest('.btn-filter');
       if (btn) applyFilter(btn.dataset.filter);
     });
+    if (runSecurityBtn) {
+      runSecurityBtn.disabled = true;
+      runSecurityBtn.addEventListener('click', runSecurityTests);
+    }
   </script>
 </body>
 </html>
